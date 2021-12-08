@@ -1,0 +1,6 @@
+bak/
+.bash_history
+cna.patch
+labeled.info.txt
+atomify.diff
+*.ll

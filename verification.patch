@@ -1,0 +1,167 @@
+diff --git a/include/asm-generic/qspinlock.h b/include/asm-generic/qspinlock.h
+index d74b138..ab941d9 100644
+--- a/include/asm-generic/qspinlock.h
++++ b/include/asm-generic/qspinlock.h
+@@ -96,7 +96,8 @@ static __always_inline void queued_spin_unlock(struct qspinlock *lock)
+ 	/*
+ 	 * unlock() needs release semantics:
+ 	 */
+-	smp_store_release(&lock->locked, 0);
++	/* NOTE: To unlock, we write to locked_val (instead of locked) */
++	smp_store_release(&lock->locked_val, 0);
+ }
+ #endif
+ 
+diff --git a/include/asm-generic/qspinlock_types.h b/include/asm-generic/qspinlock_types.h
+index 2fd1fb8..8ce268c 100644
+--- a/include/asm-generic/qspinlock_types.h
++++ b/include/asm-generic/qspinlock_types.h
+@@ -12,6 +12,12 @@
+ #include <linux/types.h>
+ 
+ typedef struct qspinlock {
++	/* NOTE: To allow for efficient verification with GenMC, we apply two
++	 * modifications to qspinlock: First, we replace the fastpath logic
++	 * of locked_pending with a simpler single lock bit. Second, we split
++	 * the MCS/CNA tail (val) from the fastpath lock (locked_val). */  
++	int locked_val;
++
+ 	union {
+ 		atomic_t val;
+ 
+@@ -89,7 +95,8 @@ typedef struct qspinlock {
+ #define _Q_TAIL_OFFSET		_Q_TAIL_IDX_OFFSET
+ #define _Q_TAIL_MASK		(_Q_TAIL_IDX_MASK | _Q_TAIL_CPU_MASK)
+ 
+-#define _Q_LOCKED_VAL		(1U << _Q_LOCKED_OFFSET)
+-#define _Q_PENDING_VAL		(1U << _Q_PENDING_OFFSET)
++/* NOTE: to minimize the changes in the code, we set these two values to 0. */
++#define _Q_LOCKED_VAL		0 // (1U << _Q_LOCKED_OFFSET)
++#define _Q_PENDING_VAL		0 // (1U << _Q_PENDING_OFFSET)
+ 
+ #endif /* __ASM_GENERIC_QSPINLOCK_TYPES_H */
+diff --git a/kernel/locking/mcs_spinlock.h b/kernel/locking/mcs_spinlock.h
+index 3926aad..82afef1 100644
+--- a/kernel/locking/mcs_spinlock.h
++++ b/kernel/locking/mcs_spinlock.h
+@@ -110,7 +110,7 @@ void mcs_spin_unlock(struct mcs_spinlock **lock, struct mcs_spinlock *node)
+ 		if (likely(cmpxchg_release(lock, node, NULL) == node))
+ 			return;
+ 		/* Wait until the next pointer is set */
+-		while (!(next = READ_ONCE(node->next)))
++		await_while(!(next = READ_ONCE(node->next)))
+ 			cpu_relax();
+ 	}
+ 
+diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
+index 8c1a21b..dea656f 100644
+--- a/kernel/locking/qspinlock.c
++++ b/kernel/locking/qspinlock.c
+@@ -66,7 +66,9 @@
+  */
+ 
+ #include "mcs_spinlock.h"
+-#define MAX_NODES	4
++/* NOTE: In the verification, we do not consider interrupts, so we can reduce
++ * the number of nodes per core to 1. */ 
++#define MAX_NODES	1
+ 
+ /*
+  * On 64-bit architectures, the mcs_spinlock structure will be 16 bytes in
+@@ -182,8 +184,8 @@ static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
+ 	 * We can use relaxed semantics since the caller ensures that the
+ 	 * MCS node is properly initialized before updating the tail.
+ 	 */
+-	return (u32)xchg_relaxed(&lock->tail,
+-				 tail >> _Q_TAIL_OFFSET) << _Q_TAIL_OFFSET;
++	/* NOTE: val is the MCS/CNA tail without additional locked_pending bits. */
++	return (u32)atomic_xchg_relaxed(&lock->val, tail);
+ }
+ 
+ #else /* _Q_PENDING_BITS == 8 */
+@@ -349,6 +351,11 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+ 	u32 old, tail;
+ 	int idx;
+ 
++	/* NOTE: To speedup verification and allow fewer threads to exercise the CNA
++	 * code, we skip all fastpath related code (locked_pending) and immediately
++	 * try to acquire the slowpath lock. */
++	goto queue;
++
+ 	BUILD_BUG_ON(CONFIG_NR_CPUS >= (1U << _Q_TAIL_CPU_BITS));
+ 
+ 	if (pv_enabled())
+@@ -471,8 +478,9 @@ pv_queue:
+ 	 * attempt the trylock once more in the hope someone let go while we
+ 	 * weren't watching.
+ 	 */
++	/* NOTE: we are not using locked_pending logic, so we can skip this trylock.
+ 	if (queued_spin_trylock(lock))
+-		goto release;
++		goto release; */
+ 
+ 	/*
+ 	 * Ensure that the initialisation of @node is complete before we
+@@ -542,6 +550,10 @@ pv_queue:
+ 	val = atomic_cond_read_acquire(&lock->val, !(VAL & _Q_LOCKED_PENDING_MASK));
+ 
+ locked:
++	/* NOTE: After acquiring the slowpath lock (val), we can now acquire the
++	 * fastpath lock (locked_val) and subsequently release the slowpath lock */
++	await_while(cmpxchg_acquire(&lock->locked_val, 0, 1) != 0);
++
+ 	/*
+ 	 * claim the lock:
+ 	 *
+@@ -573,7 +585,8 @@ locked:
+ 	 * which will then detect the remaining tail and queue behind us
+ 	 * ensuring we'll see a @next.
+ 	 */
+-	set_locked(lock);
++	/* NOTE: again, this should be removed as it corresponds to locked_pending
++	set_locked(lock); */
+ 
+ 	/*
+ 	 * contended path; wait for next if not observed yet, release.
+diff --git a/kernel/locking/qspinlock_cna.h b/kernel/locking/qspinlock_cna.h
+index 17d56c7..03b936f 100644
+--- a/kernel/locking/qspinlock_cna.h
++++ b/kernel/locking/qspinlock_cna.h
+@@ -74,7 +74,9 @@ static inline bool intra_node_threshold_reached(struct cna_node *cn)
+ 	u64 current_time = local_clock();
+ 	u64 threshold = cn->start_time + numa_spinlock_threshold_ns;
+ 
+-	return current_time > threshold;
++	/* NOTE: we non-deterministically decide whether the intra-node threshold
++	 * was reached in the client code. */
++	return READ_ONCE(cna_threshold_reached); //current_time > threshold;
+ }
+ 
+ /*
+@@ -327,8 +329,10 @@ static __always_inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
+ 		 * Try and put the time otherwise spent spin waiting on
+ 		 * _Q_LOCKED_PENDING_MASK to use by sorting our lists.
+ 		 */
++		/* NOTE: to speed up verification, we reorder the queue once
+ 		while (LOCK_IS_BUSY(lock) && !cna_order_queue(node))
+-			cpu_relax();
++			cpu_relax(); */
++		cna_order_queue(node);
+ 	} else {
+ 		cn->start_time = FLUSH_SECONDARY_QUEUE;
+ 	}
+@@ -376,6 +380,8 @@ static inline void cna_lock_handoff(struct mcs_spinlock *node,
+ 	arch_mcs_lock_handoff(&next->locked, val);
+ }
+ 
++/* NOTE: The remainder of the files isn't necessary for verification */ 
++#if 0
+ /*
+  * Constant (boot-param configurable) flag selecting the NUMA-aware variant
+  * of spinlock.  Possible values: -1 (off) / 0 (auto, default) / 1 (on).
+@@ -423,3 +429,4 @@ void __init cna_configure_spin_lock_slowpath(void)
+ 
+ 	pr_info("Enabling CNA spinlock\n");
+ }
++#endif
+\ No newline at end of file
