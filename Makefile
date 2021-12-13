@@ -122,4 +122,4 @@ verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok
 .PHONY: clean
 clean:
 	rm -rf $(EMPTY_HEADERS) $(LINUX_FILES) $(CNA_FILE) $(VERIF_FILE) \
-		*.ok *.log
+		$(CNA_PATCH_DIR) *.ok *.log
