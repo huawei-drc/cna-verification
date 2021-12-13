@@ -5,7 +5,7 @@
  * Run this client code with GenMC 0.6.1 to verify the correctness of the
  * CNA slowpath of qspinlock (qspinlock_cna.h) from Linux 5.14.
  * The client code can be alternatively configured to use the MCS slowpath or
- * even just the plain MCS lock (mcs_spinlock.h). 
+ * even just the plain MCS lock (mcs_spinlock.h).
  ******************************************************************************/
 
 /* Number of threads */
@@ -40,7 +40,7 @@
 /* includes distributed in this repository */
 #include <linux/atomic.h> /* a mapping of linux atomic to GenMC functions */
 #include <await_while.h>  /* spinloop annotations */
-#include <defs.h>         /* replacement of several Linux macros */  
+#include <defs.h>         /* replacement of several Linux macros */
 
 /* smp_processor_id */
 __thread int tid;
@@ -94,21 +94,23 @@ void *get_node(int cpu) { return &nodes[cpu]; }
 static int x = 0, y = 0;
 static void* run(void *arg)
 {
-	tid = (intptr_t)arg;
-	acquire();
-  WRITE_ONCE(x, READ_ONCE(x)+1);
-  WRITE_ONCE(y, READ_ONCE(y)+1);
-	release();
-	return NULL;
+    tid = (intptr_t)arg;
+    acquire();
+    WRITE_ONCE(x, READ_ONCE(x)+1);
+    WRITE_ONCE(y, READ_ONCE(y)+1);
+    release();
+    return NULL;
 }
 
 int main()
 {
-	pthread_t t[NTHREADS];
-	init();
-	for (intptr_t i = 0; i < NTHREADS; i++) pthread_create(t+i, 0, run, (void*)i);
-	nondet();
-	for (intptr_t i = 0; i < NTHREADS; i++) pthread_join(t[i], NULL);
-	assert (x == y && x == NTHREADS);
-	return 0;
+    pthread_t t[NTHREADS];
+    init();
+    for (intptr_t i = 0; i < NTHREADS; i++)
+        pthread_create(t+i, 0, run, (void*)i);
+    nondet();
+    for (intptr_t i = 0; i < NTHREADS; i++)
+        pthread_join(t[i], NULL);
+    assert (x == y && x == NTHREADS);
+    return 0;
 }
