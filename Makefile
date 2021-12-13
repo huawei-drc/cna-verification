@@ -82,7 +82,7 @@ EMPTY_HEADERS = \
 	include/asm/qspinlock.h \
 	include/asm/mcs_spinlock.h
 
-$(EMPTY_HEADERS): %: $(VERIF_FILE)
+$(EMPTY_HEADERS): %:
 	@mkdir -p $(@D) 2> /dev/null
 	touch $@
 
@@ -101,15 +101,15 @@ GENMC_OPTS = -mo -lkmm -check-liveness \
 INCLUDES = -I/usr/share/genmc/include -Iinclude
 CLIENT   = client-code.c
 
-qspinlock_cna.ok: $(EMPTY_HEADERS)
+qspinlock_cna.ok: $(VERIF_FILE) $(EMPTY_HEADERS)
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=4 -DALGORITHM=1 > $(@:.ok=.log) 2>&1 && touch $@
 
-qspinlock_mcs.ok: $(EMPTY_HEADERS)
+qspinlock_mcs.ok: $(VERIF_FILE) $(EMPTY_HEADERS)
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=3 -DALGORITHM=2 > $(@:.ok=.log) 2>&1 && touch $@
 
-mcs_spinlock.ok: $(EMPTY_HEADERS)
+mcs_spinlock.ok: $(VERIF_FILE) $(EMPTY_HEADERS)
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=3 -DALGORITHM=3 > $(@:.ok=.log) 2>&1 && touch $@
 
