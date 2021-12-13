@@ -26,6 +26,7 @@ RUN cd genmc \
         --with-clangxx=/usr/bin/clang++-8 \
     && make CXX=/usr/bin/clang++-8 install
 
-ENV USER_NAME=me
+ARG USER_NAME=user
 RUN adduser --disabled-password --gecos "" ${USER_NAME}
+
 USER ${USER_NAME}

@@ -92,8 +92,8 @@ empty_headers: $(EMPTY_HEADERS)
 ###############################################################################
 # Step 5: GenMC verification
 ###############################################################################
-.PHONY: verification_ready
-verification_ready: $(VERIF_FILE) $(EMPTY_HEADERS)
+.PHONY: prepared
+prepared: $(VERIF_FILE) $(EMPTY_HEADERS)
 
 GENMC_OPTS = -mo -lkmm -check-liveness \
 	-disable-race-detection \
@@ -104,15 +104,15 @@ GENMC_OPTS = -mo -lkmm -check-liveness \
 INCLUDES = -I/usr/share/genmc/include -Iinclude
 CLIENT   = client-code.c
 
-qspinlock_cna.ok: $(VERIF_FILE) $(EMPTY_HEADERS)
+qspinlock_cna.ok: prepared
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=4 -DALGORITHM=1 > $(@:.ok=.log) 2>&1 && touch $@
 
-qspinlock_mcs.ok: $(VERIF_FILE) $(EMPTY_HEADERS)
+qspinlock_mcs.ok: prepared
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=3 -DALGORITHM=2 > $(@:.ok=.log) 2>&1 && touch $@
 
-mcs_spinlock.ok: $(VERIF_FILE) $(EMPTY_HEADERS)
+mcs_spinlock.ok: prepared
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=3 -DALGORITHM=3 > $(@:.ok=.log) 2>&1 && touch $@
 
