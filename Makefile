@@ -92,6 +92,9 @@ empty_headers: $(EMPTY_HEADERS)
 ###############################################################################
 # Step 5: GenMC verification
 ###############################################################################
+.PHONY: verification_ready
+verification_ready: $(VERIF_FILE) $(EMPTY_HEADERS)
+
 GENMC_OPTS = -mo -lkmm -check-liveness \
 	-disable-race-detection \
 	-disable-load-annotation \
