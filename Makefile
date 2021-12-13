@@ -1,18 +1,23 @@
 # Copyright (c) 2021 Diogo Behrens, Antonio Paolillo
 # SPDX-License-Identifier: MIT
 
-all:
+all: verification
+
+default: verification
+
+help:
 	@echo "Goals:"
-	@echo "	linux_files	download Linux qspinlock (Linux 5.14)"
-	@echo "	cna_patch	apply CNA patch"
-	@echo "	empty_headers	create supporting empty headers"	
-	@echo "	verif_patch	apply verification patch"
-	@echo "	verification	verify qspinlock_cna with GenMC"
+	@echo "	linux_files     download Linux qspinlock (Linux 5.14)"
+	@echo "	cna_patch       apply CNA patch"
+	@echo "	verif_patch     apply verification patch"
+	@echo "	empty_headers   create supporting empty headers"
+	@echo "	verification    verify qspinlock_cna with GenMC"
 
 ###############################################################################
-# Step 1: get qspinlock files from kernel 
+# Step 1: get qspinlock files from kernel
 ###############################################################################
-LINUX_URL   = https://raw.githubusercontent.com/torvalds/linux/v5.14
+LINUX_URL     = https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/
+LINUX_VERSION = v5.14
 LINUX_FILES = \
 	kernel/locking/lock_events_list.h \
 	kernel/locking/lock_events.h \
@@ -22,26 +27,30 @@ LINUX_FILES = \
 	include/asm-generic/qspinlock.h \
 	include/asm-generic/qspinlock_types.h
 
-$(LINUX_FILES): %:  
-	curl --create-dirs -o $* $(LINUX_URL)/$* > /dev/null
+$(LINUX_FILES): %:
+	curl --create-dirs -o $* $(LINUX_URL)/$*?h=$(LINUX_VERSION) > /dev/null
 
 .PHONY: linux_files
 linux_files: $(LINUX_FILES)
 
 ###############################################################################
-# Step 2: apply CNA patch 
+# Step 2: apply CNA patch
 ###############################################################################
-CNA_PATCH = cna-v15.patch
+CNA_PATCH_DIR = cna-v15
+CNA_PATCH_URL = https://lkml.org/lkml/diff/2021/5/14
 CNA_FILE  = kernel/locking/qspinlock_cna.h
 
 $(CNA_FILE): $(LINUX_FILES)
-	patch -p1 < $(CNA_PATCH)
+	for patch_id in 820 818 822 823 817 819; do \
+		curl --create-dirs -o $(CNA_PATCH_DIR)/$$patch_id.diff $(CNA_PATCH_URL)/$$patch_id/1 ; \
+		patch -p1 --force < $(CNA_PATCH_DIR)/$$patch_id.diff ; \
+	done
 
 .PHONY: cna_patch
 cna_patch: $(CNA_FILE)
 
 ###############################################################################
-# Step 3: apply verification patch 
+# Step 3: apply verification patch
 ###############################################################################
 VERIF_PATCH = verification.patch
 VERIF_FILE  = .patch.applied
@@ -51,7 +60,7 @@ $(VERIF_FILE): $(VERIF_PATCH) $(CNA_FILE)
 	@touch $@
 
 .PHONY: verif_patch
-verif_patch: $(VERIF_FILE) 
+verif_patch: $(VERIF_FILE)
 
 ###############################################################################
 # Step 4: create a bunch of empty header files to make qspinlock happy
@@ -88,19 +97,19 @@ GENMC_OPTS = -mo -lkmm -check-liveness \
 	-disable-load-annotation \
 	-disable-cast-elimination \
 	-disable-code-condenser \
-	-disable-spin-assume 
+	-disable-spin-assume
 INCLUDES = -I/usr/share/genmc/include -Iinclude
 CLIENT   = client-code.c
 
-qspinlock_cna.ok: $(EMPTY_HEADERS) 
+qspinlock_cna.ok: $(EMPTY_HEADERS)
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=4 -DALGORITHM=1 > $(@:.ok=.log) 2>&1 && touch $@
 
-qspinlock_mcs.ok: $(EMPTY_HEADERS) 
+qspinlock_mcs.ok: $(EMPTY_HEADERS)
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=3 -DALGORITHM=2 > $(@:.ok=.log) 2>&1 && touch $@
 
-mcs_spinlock.ok: $(EMPTY_HEADERS) 
+mcs_spinlock.ok: $(EMPTY_HEADERS)
 	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
 		-DNTHREADS=3 -DALGORITHM=3 > $(@:.ok=.log) 2>&1 && touch $@
 

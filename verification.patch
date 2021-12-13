@@ -23,7 +23,7 @@ index 2fd1fb8..8ce268c 100644
 +	/* NOTE: To allow for efficient verification with GenMC, we apply two
 +	 * modifications to qspinlock: First, we replace the fastpath logic
 +	 * of locked_pending with a simpler single lock bit. Second, we split
-+	 * the MCS/CNA tail (val) from the fastpath lock (locked_val). */  
++	 * the MCS/CNA tail (val) from the fastpath lock (locked_val). */
 +	int locked_val;
 +
  	union {
@@ -63,7 +63,7 @@ index 8c1a21b..dea656f 100644
  #include "mcs_spinlock.h"
 -#define MAX_NODES	4
 +/* NOTE: In the verification, we do not consider interrupts, so we can reduce
-+ * the number of nodes per core to 1. */ 
++ * the number of nodes per core to 1. */
 +#define MAX_NODES	1
  
  /*
@@ -154,7 +154,7 @@ index 17d56c7..03b936f 100644
  	arch_mcs_lock_handoff(&next->locked, val);
  }
  
-+/* NOTE: The remainder of the files isn't necessary for verification */ 
++/* NOTE: The remainder of the files isn't necessary for verification */
 +#if 0
  /*
   * Constant (boot-param configurable) flag selecting the NUMA-aware variant
