@@ -1,7 +1,8 @@
 # Verification of Linux qspinlock_cna
 
-This repository contains the script allowing to run the verification of the CNA
-qspinlock using the GenMC model checker.
+This repository contains the script allowing to run the verification of the
+[CNA qspinlock](https://lkml.org/lkml/2021/5/14/821) using the
+[GenMC model checker](https://plv.mpi-sws.org/genmc/).
 We use this script to produce the results reported in our
 [CNA verification technical note](https://arxiv.org/abs/2111.15240) (available
 on arXiv).
@@ -13,7 +14,7 @@ It requires an Internet connection to get the different source and patch files
 and the following to be installed:
 - make
 - curl
-- GenMC
+- GenMC v0.6.1
 
 ## Verifying CNA with GenMC installed on the host
 
@@ -61,10 +62,8 @@ by mounting the git repository in it:
 
     docker run -it --rm -v $(pwd):/workspace -u $(id -u):$(id -g) -w /workspace genmc-cna make
 
-This last command will run GenMC to verify MCS spinlock with 3 threads,
-MCS qspinlock with 3 threads and, finally, CNA qspinlock with 4 threads
-(as reported in Section 4 of
-[our technical note](https://arxiv.org/abs/2111.15240)).
+This last command will run GenMC to verify the different locks (as described in
+the previous section).
 
 ## The verification patch
 
