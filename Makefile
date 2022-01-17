@@ -105,16 +105,16 @@ INCLUDES = -I/usr/share/genmc/include -Iinclude
 CLIENT   = client-code.c
 
 qspinlock_cna.ok: prepared
-	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
-		-DNTHREADS=4 -DALGORITHM=1 > $(@:.ok=.log) 2>&1 && touch $@
+	genmc $(GENMC_OPTS) -- $(INCLUDES) \
+		-DNTHREADS=4 -DALGORITHM=1 $(CLIENT) > $(@:.ok=.log) 2>&1 && touch $@
 
 qspinlock_mcs.ok: prepared
-	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
-		-DNTHREADS=3 -DALGORITHM=2 > $(@:.ok=.log) 2>&1 && touch $@
+	genmc $(GENMC_OPTS) -- $(INCLUDES) \
+		-DNTHREADS=3 -DALGORITHM=2 $(CLIENT) > $(@:.ok=.log) 2>&1 && touch $@
 
 mcs_spinlock.ok: prepared
-	genmc $(GENMC_OPTS) -- $(INCLUDES) $(CLIENT) \
-		-DNTHREADS=3 -DALGORITHM=3 > $(@:.ok=.log) 2>&1 && touch $@
+	genmc $(GENMC_OPTS) -- $(INCLUDES) \
+		-DNTHREADS=3 -DALGORITHM=3 $(CLIENT) > $(@:.ok=.log) 2>&1 && touch $@
 
 .PHONY: verification
 verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok

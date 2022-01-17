@@ -17,14 +17,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace/
-RUN git clone --branch v0.6.1 --depth 1 https://github.com/MPI-SWS/genmc.git 2> /dev/null
+RUN git clone --branch v0.7 --depth 1 https://github.com/MPI-SWS/genmc.git 2> /dev/null
 RUN cd genmc \
     && autoreconf --install \
     && ./configure \
         --with-llvm=/usr/lib/llvm-8 \
         --with-clang=/usr/bin/clang-8 \
         --with-clangxx=/usr/bin/clang++-8 \
-    && make CXX=/usr/bin/clang++-8 install
+    && make -j$(nproc) CXX=/usr/bin/clang++-8 install
 
 ARG USER_NAME=user
 RUN adduser --disabled-password --gecos "" ${USER_NAME}
