@@ -120,6 +120,23 @@ mcs_spinlock.ok: prepared
 verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok
 
 ###############################################################################
+# Patch creation targets
+###############################################################################
+
+patch_prepare:
+	git checkout -b patch-branch
+	make linux_files cna_patch
+	git add include kernel && git commit -m"cna-patched code"
+	make verif_patch
+
+patch_update:
+	git diff HEAD > new-verification.patch
+	git reset --hard
+	git checkout master
+	git branch -D patch-branch
+	mv new-verification.patch verification.patch
+
+###############################################################################
 # Other goals
 ###############################################################################
 .PHONY: clean
