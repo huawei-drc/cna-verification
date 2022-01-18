@@ -55,7 +55,7 @@ void *get_node(int cpu);
 /* NUMA node mapping and intra-node threshold for CNA */
 #if ALGORITHM == QSPINLOCK_CNA
 #define CONFIG_NUMA_AWARE_SPINLOCKS
-#define cpu_to_node(x) (x < NTHREADS/2)
+#define cpu_to_node(x) ((x < NTHREADS/2) ? 1 : 2)
 static bool cna_threshold_reached = false;
 #endif
 
