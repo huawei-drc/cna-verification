@@ -31,7 +31,7 @@
 
 /* additional macros used in qspinlock_cna.h */
 #define module_param(A,B,C)
-#define local_clock() (0)
+#define local_clock() (2)
 #define next_pseudo_random32(X) (X)
 #define irqs_disabled() 0
 #define rt_task(X) 0
