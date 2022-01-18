@@ -13,7 +13,7 @@ index d74b138..ab941d9 100644
  #endif
  
 diff --git a/include/asm-generic/qspinlock_types.h b/include/asm-generic/qspinlock_types.h
-index 2fd1fb8..8ce268c 100644
+index 2fd1fb8..b9c4c50 100644
 --- a/include/asm-generic/qspinlock_types.h
 +++ b/include/asm-generic/qspinlock_types.h
 @@ -12,6 +12,12 @@
@@ -54,7 +54,7 @@ index 3926aad..82afef1 100644
  	}
  
 diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
-index 8c1a21b..dea656f 100644
+index 8c1a21b..ffb4a09 100644
 --- a/kernel/locking/qspinlock.c
 +++ b/kernel/locking/qspinlock.c
 @@ -66,7 +66,9 @@
@@ -124,7 +124,7 @@ index 8c1a21b..dea656f 100644
  	/*
  	 * contended path; wait for next if not observed yet, release.
 diff --git a/kernel/locking/qspinlock_cna.h b/kernel/locking/qspinlock_cna.h
-index 17d56c7..03b936f 100644
+index 17d56c7..0c573b3 100644
 --- a/kernel/locking/qspinlock_cna.h
 +++ b/kernel/locking/qspinlock_cna.h
 @@ -74,7 +74,9 @@ static inline bool intra_node_threshold_reached(struct cna_node *cn)
@@ -138,19 +138,20 @@ index 17d56c7..03b936f 100644
  }
  
  /*
-@@ -327,8 +329,10 @@ static __always_inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
+@@ -327,8 +329,11 @@ static __always_inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
  		 * Try and put the time otherwise spent spin waiting on
  		 * _Q_LOCKED_PENDING_MASK to use by sorting our lists.
  		 */
-+		/* NOTE: to speed up verification, we reorder the queue once
++		/* NOTE: to speed up verification, we reorder the queue only twice.
  		while (LOCK_IS_BUSY(lock) && !cna_order_queue(node))
 -			cpu_relax();
 +			cpu_relax(); */
 +		cna_order_queue(node);
++		cna_order_queue(node);
  	} else {
  		cn->start_time = FLUSH_SECONDARY_QUEUE;
  	}
-@@ -376,6 +380,8 @@ static inline void cna_lock_handoff(struct mcs_spinlock *node,
+@@ -376,6 +381,8 @@ static inline void cna_lock_handoff(struct mcs_spinlock *node,
  	arch_mcs_lock_handoff(&next->locked, val);
  }
  
@@ -159,9 +160,8 @@ index 17d56c7..03b936f 100644
  /*
   * Constant (boot-param configurable) flag selecting the NUMA-aware variant
   * of spinlock.  Possible values: -1 (off) / 0 (auto, default) / 1 (on).
-@@ -423,3 +429,4 @@ void __init cna_configure_spin_lock_slowpath(void)
+@@ -423,3 +430,4 @@ void __init cna_configure_spin_lock_slowpath(void)
  
  	pr_info("Enabling CNA spinlock\n");
  }
 +#endif
-\ No newline at end of file
