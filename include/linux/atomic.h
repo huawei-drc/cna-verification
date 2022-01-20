@@ -1,12 +1,17 @@
 #ifndef ATOMIC_H
 #define ATOMIC_H
 
-#include <genmc/lkmm.h>
-#define smp_acquire__after_ctrl_dep() smp_rmb()
-
+#ifdef MOCK_LKMM
+  #include "lkmm-mock.h"
+  #define smp_acquire__after_ctrl_dep() __atomic_thread_fence(__ATOMIC_ACQUIRE)
+#else
+  #include <genmc/lkmm.h>
+  #define smp_acquire__after_ctrl_dep() smp_rmb()
+#endif
 #define atomic_try_cmpxchg_acquire(x, o, n) ((int) *o == cmpxchg_acquire(&(x)->counter, (int) *o, n))
 #define atomic_try_cmpxchg_relaxed(x, o, n) ((int) *o == cmpxchg_relaxed(&(x)->counter, (int) *o, n))
 #define atomic_try_cmpxchg_release(x, o, n) ((int) *o == cmpxchg_release(&(x)->counter, (int) *o, n))
+#define atomic_try_cmpxchg(x, o, n)         ((int) *o == cmpxchg(&(x)->counter, (int) *o, n))
 
 #define atomic_fetch_or_acquire(i, v) __atomic_fetch_or(&(v)->counter, i, __ATOMIC_ACQUIRE)
 
@@ -29,7 +34,7 @@
       __unqual_scalar_typeof(*ptr) VAL;                       \
       await_do {                                              \
               VAL = READ_ONCE(*__PTR); 	                      \
-	   } while_await (!cond_expr);                        \
+	         } while_await (!cond_expr);                        \
       (typeof(*ptr))VAL;                                      \
 })
 
