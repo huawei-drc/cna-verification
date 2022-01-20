@@ -1,6 +1,8 @@
-bak/
+.vscode/
 .idea/
 .bash_history
 labeled.info.txt
 atomify.diff
+.patch.applied
+.patch.prepared
 *.ll

@@ -121,26 +121,49 @@ verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok
 
 ###############################################################################
 # Patch creation targets
+#
+# Workflow
+# 1- start with clean repository from master
+# 2- run: make patch_prepare
+# 3- do the changes to the qspinlock and CNA files
+# 4- run: make patch_create
+# 5- review new patch file; if not ready, goto 3
+# 6- run: make patch_update
+# 7- commit modified verification patch to master
 ###############################################################################
+PATCH_PREP_FILE = .patch.prepared
+NEW_VERIF_PATCH = $(VERIF_PATCH).new
 
-patch_prepare:
+$(PATCH_PREP_FILE):
 	git checkout -b patch-branch
-	make linux_files cna_patch
-	git add include kernel && git commit -m"cna-patched code"
+	make linux_files cna_patch empty_headers
+	git add include kernel
+	git commit -m"applied cna patch"
 	make verif_patch
+	git add include kernel
+	git commit -m"applied old verification patch"
+	touch $@
+patch_prepare: $(PATCH_PREP_FILE)
 
-patch_update:
-	git diff HEAD > new-verification.patch
+patch_create: $(PATCH_PREP_FILE)
+	git diff HEAD~1 > $(NEW_VERIF_PATCH)
+
+patch_update: patch_create
+	make patch_abort
+	mv $(NEW_VERIF_PATCH) $(VERIF_FILE)
+
+patch_abort: clean
 	git reset --hard
 	git checkout master
 	git branch -D patch-branch
-	mv new-verification.patch verification.patch
 
+.PHONY: patch_prepare patch_create patch_update patch_abort
 ###############################################################################
 # Other goals
 ###############################################################################
 .PHONY: clean
 clean:
 	rm -rf $(EMPTY_HEADERS) $(LINUX_FILES) $(CNA_FILE) $(VERIF_FILE) \
-		$(CNA_PATCH_DIR) *.ok *.log
+		$(CNA_PATCH_DIR) $(PATCH_PREP_FILE) $(NEW_VERIF_PATCH) \
+		*.ok *.log
 	find . -empty -type d -delete
