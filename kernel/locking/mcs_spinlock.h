@@ -110,7 +110,7 @@ void mcs_spin_unlock(struct mcs_spinlock **lock, struct mcs_spinlock *node)
 		if (likely(cmpxchg_release(lock, node, NULL) == node))
 			return;
 		/* Wait until the next pointer is set */
-		while (!(next = READ_ONCE(node->next)))
+		await_while(!(next = READ_ONCE(node->next)))
 			cpu_relax();
 	}
 

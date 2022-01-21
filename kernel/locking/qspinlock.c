@@ -66,7 +66,9 @@
  */
 
 #include "mcs_spinlock.h"
-#define MAX_NODES	4
+/* NOTE: In the verification, we do not consider interrupts, so we can reduce
+ * the number of nodes per core to 1. */
+#define MAX_NODES	1
 
 /*
  * On 64-bit architectures, the mcs_spinlock structure will be 16 bytes in
@@ -141,7 +143,7 @@ struct mcs_spinlock *grab_mcs_node(struct mcs_spinlock *base, int idx)
 
 #define _Q_LOCKED_PENDING_MASK (_Q_LOCKED_MASK | _Q_PENDING_MASK)
 
-#if _Q_PENDING_BITS == 8
+#if _Q_PENDING_BITS == 8 && !defined(VERIFICATION)
 /**
  * clear_pending - clear the pending bit.
  * @lock: Pointer to queued spinlock structure
@@ -263,7 +265,11 @@ static __always_inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lo
  */
 static __always_inline void set_locked(struct qspinlock *lock)
 {
+#ifdef VERIFICATION
+	atomic_or(_Q_LOCKED_VAL, &lock->val);
+#else
 	WRITE_ONCE(lock->locked, _Q_LOCKED_VAL);
+#endif
 }
 
 
@@ -348,7 +354,9 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 	struct mcs_spinlock *prev, *next, *node;
 	u32 old, tail;
 	int idx;
-
+#ifdef SKIP_PENDING
+	goto queue;
+#endif
 	BUILD_BUG_ON(CONFIG_NR_CPUS >= (1U << _Q_TAIL_CPU_BITS));
 
 	if (pv_enabled())
@@ -365,8 +373,13 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 	 */
 	if (val == _Q_PENDING_VAL) {
 		int cnt = _Q_PENDING_LOOPS;
+#ifdef VERIFICATION
+		val = atomic_cond_read_acquire(&lock->val,
+					       (VAL != _Q_PENDING_VAL) || !cnt--);
+#else
 		val = atomic_cond_read_relaxed(&lock->val,
 					       (VAL != _Q_PENDING_VAL) || !cnt--);
+#endif
 	}
 
 	/*
@@ -462,8 +475,13 @@ pv_queue:
 	 */
 	barrier();
 
+#ifdef VERIFICATION
+	WRITE_ONCE(node->locked, 0);
+	WRITE_ONCE(node->next, NULL);
+#else
 	node->locked = 0;
 	node->next = NULL;
+#endif
 	pv_init_node(node);
 
 	/*
@@ -471,15 +489,21 @@ pv_queue:
 	 * attempt the trylock once more in the hope someone let go while we
 	 * weren't watching.
 	 */
+#if !defined(SKIP_PENDING) && !defined(VERIFICATION)
 	if (queued_spin_trylock(lock))
 		goto release;
+#endif
 
 	/*
 	 * Ensure that the initialisation of @node is complete before we
 	 * publish the updated tail via xchg_tail() and potentially link
 	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
 	 */
+#ifdef VERIFICATION
+	smp_mb();
+#else
 	smp_wmb();
+#endif
 
 	/*
 	 * Publish the updated tail.
@@ -579,7 +603,11 @@ locked:
 	 * contended path; wait for next if not observed yet, release.
 	 */
 	if (!next)
+#ifdef VERIFICATION
+		next = smp_cond_load_acquire(&node->next, (VAL));
+#else
 		next = smp_cond_load_relaxed(&node->next, (VAL));
+#endif
 
 	mcs_lock_handoff(node, next);
 	pv_kick_node(lock, next);
