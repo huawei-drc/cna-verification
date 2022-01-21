@@ -3,18 +3,67 @@
 
 #ifdef MOCK_LKMM
   #include "lkmm-mock.h"
-  #define smp_acquire__after_ctrl_dep() __atomic_thread_fence(__ATOMIC_ACQUIRE)
+  #define atomic_or(i, v)      ((void)__atomic_fetch_or(&(v)->counter, i, __ATOMIC_RELAXED))
+  #define atomic_andnot(i, v)  ((void)__atomic_fetch_and(&(v)->counter, ~(i), __ATOMIC_RELAXED))
+#elif 1
+  #include <lkmm.h>
+  //#define smp_acquire__after_ctrl_dep() smp_rmb()
+  #define smp_acquire__after_ctrl_dep() smp_mb() // necessary
+  #undef atomic_cmpxchg_relaxed
+  #define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n) 
+  #define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
+  #define atomic_fetch_and_release(i, v) __atomic_fetch_and(&(v)->counter, i, memory_order_release)
+  // BinOp in https://llvm.org/doxygen/classllvm_1_1AtomicRMWInst.html
+  // xchg, add, and, ...
+  //#define atomic_and(i, v, m)  __VERIFIER_atomicrmw_noret(&(v)->counter, i, __ATOMIC_RELAXED, 3)
+  //#define atomic_or(i, v)      __VERIFIER_atomicrmw_noret(&(v)->counter, i, __ATOMIC_RELAXED, 5)
+
+  #undef atomic_add
+  #define atomic_add(i, v) ((int32_t)(i) >= 0 ? \
+	  (__atomic_add( (i), v, memory_order_relaxed)): \
+	  (__atomic_sub(-(i), v, memory_order_relaxed)))
+
+  #define atomic_or(i, v)           ((void)__atomic_fetch_or(&(v)->counter, i, memory_order_relaxed))
+  #define atomic_or_release(i, v)   ((void)__atomic_fetch_or(&(v)->counter, i, memory_order_release))
+  #define atomic_andnot(i, v)       ((void)__atomic_fetch_and(&(v)->counter, ~(i), memory_order_relaxed))
 #else
-  #include <genmc/lkmm.h>
-  #define smp_acquire__after_ctrl_dep() smp_rmb()
+  #include <genmc_internal.h>
+  #include <lkmm.h>
+  
+  #undef atomic_cmpxchg_relaxed
+  #define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n) 
+
+  #undef atomic_add
+  #define atomic_add(i, v) do { \
+            __VERIFIER_atomicrmw_noret();           \
+            ((int32_t)(i) >= 0 ? \
+	             (atomic_fetch_add_explicit(&(v)->counter, (i), memory_order_relaxed), 0) : \
+	              (atomic_fetch_sub_explicit(&(v)->counter, -(i), memory_order_relaxed), 0)); \
+  } while (0)
+ 
+  #define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
+  #define atomic_or(i, v)  do { \
+      (void) /*__VERIFIER_atomicrmw_noret();   */        \
+      atomic_fetch_or_explicit(&(v)->counter, i, memory_order_relaxed); \
+  } while(0)
+  #define atomic_andnot(i, v) do { \
+    (void ) /*__VERIFIER_atomicrmw_noret();*/           \
+    atomic_fetch_and_explicit(&(v)->counter, ~(i), memory_order_relaxed); \
+  } while(0)
+  #define smp_acquire__after_ctrl_dep() smp_mb() // necessary
 #endif
-#define atomic_try_cmpxchg_acquire(x, o, n) ((int) *o == cmpxchg_acquire(&(x)->counter, (int) *o, n))
-#define atomic_try_cmpxchg_relaxed(x, o, n) ((int) *o == cmpxchg_relaxed(&(x)->counter, (int) *o, n))
-#define atomic_try_cmpxchg_release(x, o, n) ((int) *o == cmpxchg_release(&(x)->counter, (int) *o, n))
-#define atomic_try_cmpxchg(x, o, n)         ((int) *o == cmpxchg(&(x)->counter, (int) *o, n))
 
-#define atomic_fetch_or_acquire(i, v) __atomic_fetch_or(&(v)->counter, i, __ATOMIC_ACQUIRE)
 
+#define __atomic_try_cmpxchg(x, o, n, mo) ({         \
+        typeof(*o) r;                                \
+        r = cmpxchg##mo(&(x)->counter, (int) *o, n); \
+        (r == *o) ? 1 : (*o = r, 0);                 \
+})
+#define atomic_try_cmpxchg_acquire(x, o, n) __atomic_try_cmpxchg(x, o, n, _acquire)
+#define atomic_try_cmpxchg_relaxed(x, o, n) __atomic_try_cmpxchg(x, o, n, _relaxed)
+#define atomic_try_cmpxchg_release(x, o, n) __atomic_try_cmpxchg(x, o, n, _release)
+#define atomic_try_cmpxchg(x, o, n)         __atomic_try_cmpxchg(x, o, n,)
+ 
 #define __scalar_type_to_expr_cases(type)                               \
                 unsigned type:  (unsigned type)0,                       \
                 signed type:    (signed type)0
@@ -32,18 +81,15 @@
 #define smp_cond_load_relaxed(ptr, cond_expr) ({              \
       typeof(ptr) __PTR = (ptr);                              \
       __unqual_scalar_typeof(*ptr) VAL;                       \
-      await_do {                                              \
-              VAL = READ_ONCE(*__PTR); 	                      \
-	         } while_await (!cond_expr);                        \
+      await_while((VAL = READ_ONCE(*__PTR), !(cond_expr)));   \
       (typeof(*ptr))VAL;                                      \
 })
 
-
-#define smp_cond_load_acquire(ptr, cond_expr) ({                \
-        __unqual_scalar_typeof(*ptr) _val;                      \
-        _val = smp_cond_load_relaxed(ptr, cond_expr);           \
-        smp_acquire__after_ctrl_dep();                          \
-        (typeof(*ptr))_val;                                     \
+#define smp_cond_load_acquire(ptr, cond_expr) ({              \
+        __unqual_scalar_typeof(*ptr) _val;                    \
+        _val = smp_cond_load_relaxed(ptr, cond_expr);         \
+        smp_acquire__after_ctrl_dep();                        \
+        (typeof(*ptr))_val;                                   \
 })
 
 #define atomic_cond_read_relaxed(ptr, cond_expr) smp_cond_load_relaxed(&(ptr)->counter, cond_expr)

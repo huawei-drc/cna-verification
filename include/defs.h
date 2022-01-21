@@ -12,7 +12,7 @@
 #define ulong u64
 
 /* per cpu data */
-#define DEFINE_PER_CPU_ALIGNED(T, V) T __thread V
+#define DEFINE_PER_CPU_ALIGNED(T, V) T V[CONFIG_NR_CPUS]
 #define DEFINE_PER_CPU(T, V) DEFINE_PER_CPU_ALIGNED(T, V)
 #define this_cpu_read(X) (X)
 #define this_cpu_write(X,Y) (X=Y)
