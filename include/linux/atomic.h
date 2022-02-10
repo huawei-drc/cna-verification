@@ -7,24 +7,17 @@
   #define atomic_andnot(i, v)  ((void)__atomic_fetch_and(&(v)->counter, ~(i), __ATOMIC_RELAXED))
 #elif 1
   #include <lkmm.h>
-  //#define smp_acquire__after_ctrl_dep() smp_rmb()
-  #define smp_acquire__after_ctrl_dep() smp_mb() // necessary
+  #define smp_acquire__after_ctrl_dep() smp_rmb()  
   #undef atomic_cmpxchg_relaxed
   #define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n) 
   #define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
-  #define atomic_fetch_and_release(i, v) __atomic_fetch_and(&(v)->counter, i, memory_order_release)
-  // BinOp in https://llvm.org/doxygen/classllvm_1_1AtomicRMWInst.html
-  // xchg, add, and, ...
-  //#define atomic_and(i, v, m)  __VERIFIER_atomicrmw_noret(&(v)->counter, i, __ATOMIC_RELAXED, 3)
-  //#define atomic_or(i, v)      __VERIFIER_atomicrmw_noret(&(v)->counter, i, __ATOMIC_RELAXED, 5)
-
+ 
   #undef atomic_add
   #define atomic_add(i, v) ((int32_t)(i) >= 0 ? \
 	  (__atomic_add( (i), v, memory_order_relaxed)): \
 	  (__atomic_sub(-(i), v, memory_order_relaxed)))
 
   #define atomic_or(i, v)           ((void)__atomic_fetch_or(&(v)->counter, i, memory_order_relaxed))
-  #define atomic_or_release(i, v)   ((void)__atomic_fetch_or(&(v)->counter, i, memory_order_release))
   #define atomic_andnot(i, v)       ((void)__atomic_fetch_and(&(v)->counter, ~(i), memory_order_relaxed))
 #else
   #include <genmc_internal.h>
@@ -42,6 +35,7 @@
   } while (0)
  
   #define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
+ 
   #define atomic_or(i, v)  do { \
       (void) /*__VERIFIER_atomicrmw_noret();   */        \
       atomic_fetch_or_explicit(&(v)->counter, i, memory_order_relaxed); \
