@@ -58,6 +58,13 @@ Note the code has also a mock LKMM using IMM. You can make everything SEQ_CST wi
 
 
 -----------------------
+-----------------------
+
+original readme follows...
+
+-----------------------
+-----------------------
+
 # Verification of Linux qspinlock_cna
 
 This repository contains the script allowing to run the verification of the
