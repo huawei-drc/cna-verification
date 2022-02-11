@@ -42,11 +42,17 @@
  */ 
 #define SPIN_ANNOTATION
 
+/* GenMC runs out of memory if cond_load_relaxed are really relaxed. Therefore,
+ * we replace them by default with cond_load_acquire.
+ * Define COND_LOAD_RLX to disable that */
+#ifndef COND_LOAD_RLX 
+#define COND_LOAD_ACQUIRE
+#endif
+
 /*******************************************************************************
  * Includes, context, lock selection -- NO USER OPTIONS FROM HERE ON.
  ******************************************************************************/
 #define VERIFICATION
-#define COND_LOAD_ACQUIRE
 
 #include <assert.h>
 #include <pthread.h>
