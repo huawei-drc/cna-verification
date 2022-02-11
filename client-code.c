@@ -14,10 +14,14 @@
 #endif
 
 /* Number of threads that reacquire the lock (once) */
+#ifndef REACQUIRE
 #define REACQUIRE 0
+#endif
 
 /* Number of reacquires for each thread that does reacquires */ 
+#ifndef REPEAT
 #define REPEAT 1
+#endif
 
 /* Supported algorithms */
 #define QSPINLOCK_CNA 1
@@ -42,6 +46,7 @@
  * Includes, context, lock selection -- NO USER OPTIONS FROM HERE ON.
  ******************************************************************************/
 #define VERIFICATION
+#define COND_LOAD_ACQUIRE
 
 #include <assert.h>
 #include <pthread.h>
@@ -130,8 +135,8 @@ static void* run(void *arg)
   int rpt = REPEAT;
 again:
   acquire();
-	x++;
-	y++;
+	WRITE_ONCE(x, READ_ONCE(x)+1); /* GenMC has issues here */
+  WRITE_ONCE(y, READ_ONCE(y)+1); /* if these are plain accesses. */
   release();
   if (tid < REACQUIRE && rpt--)
     goto again;
