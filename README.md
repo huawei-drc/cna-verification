@@ -1,3 +1,63 @@
+# PLEASE DONT SHARE THIS CODE!!!!
+
+Questions: `diogo.behrens@huawei.com`, `antonio.paolillo@huawei.com`
+
+There are several issues that occur with GenMC 0.7 here. Among them:
+
+1.	wmb/rmb races, safety things: we have discussed this in previous tickets
+2.	GenMC 0.7 runs out of memory
+3.	Issues with atomic_add(-PENDING+LOCKED)
+
+Here is how I usually verify this code.
+
+```
+genmc -mo -lkmm -check-liveness \
+    -disable-load-annotation \
+    -disable-cast-elimination \
+    -disable-code-condenser \
+    -disable-spin-assume \
+    -nthreads 6  \
+    -- \
+    -Iinclude \
+    -DNTHREADS=3 \
+    -DREACQUIRE=1 \
+    -DALGORITHM=2 \
+    client-code.c
+```
+
+## out-of-memory:
+To make genmc run out-of-memory define COND_LOAD_RLX. This makes qspinlock use the expected relaxed cond_loads. We replaced them with cond_load_acquire otherwise genmc crashes.
+
+```
+genmc -mo -lkmm -check-liveness \
+    -disable-load-annotation \
+    -disable-cast-elimination \
+    -disable-code-condenser \
+    -disable-spin-assume \
+    -nthreads 6  \
+    -- \
+    -Iinclude \
+    -DNTHREADS=4 \
+    -DREACQUIRE=0 \
+    -DALGORITHM=2 \
+    -DCOND_LOAD_RLX \
+    client-code.c
+```
+
+## atomic_add:
+
+I had to replace the atomic_add definition from lkmm.h (see include/linux/atomic.h). It seems some issue with signed/unsigned.
+
+## CNA verification:
+
+`ALGORITHM` decides if we verify qspinlock, qspinlock-cna, or the mcslock. CNA finishes with 4 threads, but that is not sufficient to verify the algorithm. Either we need more threads, or we need to skip the pending logic (`-DSKIP_PENDING`). In that case, GenMC takes ages. I don’t know if it will ever terminate. Note that GenMC finishes in ~3h if all accesses are SEQ_CST.
+
+Note the code has also a mock LKMM using IMM. You can make everything SEQ_CST with `-DMOCK_LKMM -DSC_MOCK`.
+
+
+
+
+-----------------------
 # Verification of Linux qspinlock_cna
 
 This repository contains the script allowing to run the verification of the
