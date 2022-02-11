@@ -2,12 +2,16 @@
 #define ATOMIC_H
 
 #ifdef MOCK_LKMM
+  /* to debug issues with LKMM mapping of genmc while using IMM */
   #include "lkmm-mock.h"
   #define atomic_or(i, v)      ((void)__atomic_fetch_or(&(v)->counter, i, __ATOMIC_RELAXED))
   #define atomic_andnot(i, v)  ((void)__atomic_fetch_and(&(v)->counter, ~(i), __ATOMIC_RELAXED))
+
 #elif 1
+  /* fixes necessary for GenMC 0.7 */
   #include <lkmm.h>
-  #define smp_acquire__after_ctrl_dep() smp_rmb()  
+  //#define smp_acquire__after_ctrl_dep() smp_rmb()  
+  #define smp_acquire__after_ctrl_dep() smp_mb()  
   #undef atomic_cmpxchg_relaxed
   #define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n) 
   #define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
@@ -19,10 +23,14 @@
 
   #define atomic_or(i, v)           ((void)__atomic_fetch_or(&(v)->counter, i, memory_order_relaxed))
   #define atomic_andnot(i, v)       ((void)__atomic_fetch_and(&(v)->counter, ~(i), memory_order_relaxed))
+
 #else
+  /* fixes necessary for GenMC 0.7.* (dev) */
   #include <genmc_internal.h>
   #include <lkmm.h>
   
+  #define smp_acquire__after_ctrl_dep() smp_rmb()
+
   #undef atomic_cmpxchg_relaxed
   #define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n) 
 
@@ -44,7 +52,6 @@
     (void ) /*__VERIFIER_atomicrmw_noret();*/           \
     atomic_fetch_and_explicit(&(v)->counter, ~(i), memory_order_relaxed); \
   } while(0)
-  #define smp_acquire__after_ctrl_dep() smp_mb() // necessary
 #endif
 
 
@@ -79,11 +86,19 @@
       (typeof(*ptr))VAL;                                      \
 })
 
-#define smp_cond_load_acquire(ptr, cond_expr) ({              \
+#define smp_cond_load_acquirex(ptr, cond_expr) ({              \
         __unqual_scalar_typeof(*ptr) _val;                    \
         _val = smp_cond_load_relaxed(ptr, cond_expr);         \
-        smp_acquire__after_ctrl_dep();                        \
+        smp_acquire__after_ctrl_dep();                         \
         (typeof(*ptr))_val;                                   \
+})
+
+/* this is almmost equivalent to the above macro and works better with GenMC */
+#define smp_cond_load_acquire(ptr, cond_expr) ({              \
+      typeof(ptr) __PTR = (ptr);                              \
+      __unqual_scalar_typeof(*ptr) VAL;                       \
+      await_while((VAL = smp_load_acquire(__PTR), !(cond_expr)));   \
+      (typeof(*ptr))VAL;                                      \
 })
 
 #define atomic_cond_read_relaxed(ptr, cond_expr) smp_cond_load_relaxed(&(ptr)->counter, cond_expr)
