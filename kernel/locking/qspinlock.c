@@ -373,7 +373,7 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 	 */
 	if (val == _Q_PENDING_VAL) {
 		int cnt = _Q_PENDING_LOOPS;
-#ifdef VERIFICATION
+#ifdef COND_LOAD_ACQUIRE
 		val = atomic_cond_read_acquire(&lock->val,
 					       (VAL != _Q_PENDING_VAL) || !cnt--);
 #else
@@ -522,6 +522,9 @@ pv_queue:
 	if (old & _Q_TAIL_MASK) {
 		prev = decode_tail(old);
 
+#ifdef MOCK_LKMM
+		smp_mb();
+#endif
 		/* Link @node into the waitqueue. */
 		WRITE_ONCE(prev->next, node);
 
@@ -603,7 +606,7 @@ locked:
 	 * contended path; wait for next if not observed yet, release.
 	 */
 	if (!next)
-#ifdef VERIFICATION
+#ifdef COND_LOAD_ACQUIRE
 		next = smp_cond_load_acquire(&node->next, (VAL));
 #else
 		next = smp_cond_load_relaxed(&node->next, (VAL));
