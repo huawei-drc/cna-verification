@@ -93,7 +93,7 @@
         (typeof(*ptr))_val;                                   \
 })
 
-/* this is almmost equivalent to the above macro and works better with GenMC */
+/* this is almost equivalent to the above macro and works better with GenMC */
 #define smp_cond_load_acquire(ptr, cond_expr) ({              \
       typeof(ptr) __PTR = (ptr);                              \
       __unqual_scalar_typeof(*ptr) VAL;                       \
