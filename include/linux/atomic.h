@@ -7,7 +7,7 @@
   #define atomic_or(i, v)      ((void)__atomic_fetch_or(&(v)->counter, i, __ATOMIC_RELAXED))
   #define atomic_andnot(i, v)  ((void)__atomic_fetch_and(&(v)->counter, ~(i), __ATOMIC_RELAXED))
 
-#elif 1
+#elif !defined(GENMC_DEV)
   /* fixes necessary for GenMC 0.7 */
   #include <lkmm.h>
   //#define smp_acquire__after_ctrl_dep() smp_rmb()  

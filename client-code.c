@@ -64,9 +64,9 @@
   void __VERIFIER_loop_begin(void);
   void __VERIFIER_spin_start(void);
   void __VERIFIER_spin_end(bool);
-  #define await_while(cond) for (__VERIFIER_loop_begin();                \
-      __VERIFIER_spin_start(), (cond) ? 1 : (__VERIFIER_spin_end(1), 0); \
-      __VERIFIER_spin_end(0))
+  #define await_while(cond) for (__VERIFIER_loop_begin();			\
+	__VERIFIER_spin_start(), (cond) ? 1 : (__VERIFIER_spin_end(1), 0);	\
+	__VERIFIER_spin_end(0))
 #else
   #define await_while(cond) while(cond)
 #endif
@@ -99,35 +99,35 @@ static bool cna_threshold_reached = false;
 
 /* select lock and context */
 #if ALGORITHM == QSPINLOCK_CNA
-  struct qspinlock lock;
-  /* use this instead of qnodes to make type clear in debugging */
-  struct cna_node nodes[NTHREADS];
-  #define init()    cna_init_nodes();
-  #define nondet()  WRITE_ONCE(cna_threshold_reached, true);
+	struct qspinlock lock;
+	/* use this instead of qnodes to make type clear in debugging */
+	struct cna_node nodes[NTHREADS];
+	#define init()    cna_init_nodes();
+	#define nondet()  WRITE_ONCE(cna_threshold_reached, true);
 #ifdef SKIP_PENDING
-  #define acquire() queued_spin_lock_slowpath(&lock, 0)
+	#define acquire() queued_spin_lock_slowpath(&lock, 0)
 #else
-  #define acquire() queued_spin_lock(&lock)
-#endif
-  #define release() queued_spin_unlock(&lock)
+	#define acquire() queued_spin_lock(&lock)
+#endif /* SKIP_PENDING */
+	#define release() queued_spin_unlock(&lock)
 #elif ALGORITHM == QSPINLOCK_MCS
-  struct qspinlock lock;
-  #define nodes (*qnodes)
-  #define init()
-  #define nondet()
+	struct qspinlock lock;
+	#define nodes (*qnodes)
+	#define init()
+	#define nondet()
 #ifdef SKIP_PENDING
-  #define acquire() queued_spin_lock_slowpath(&lock, 0)
+	#define acquire() queued_spin_lock_slowpath(&lock, 0)
 #else
-  #define acquire() queued_spin_lock(&lock)
-#endif
-  #define release() queued_spin_unlock(&lock)
+	#define acquire() queued_spin_lock(&lock)
+#endif /* SKIP_PENDING */
+	#define release() queued_spin_unlock(&lock)
 #else /* ALGORITHM == MCS_SPINLOCK */
-  struct mcs_spinlock *lock;
-  struct mcs_spinlock nodes[NTHREADS];
-  #define init()
-  #define nondet()
-  #define acquire() mcs_spin_lock(&lock, get_node(tid))
-  #define release() mcs_spin_unlock(&lock, get_node(tid))
+	struct mcs_spinlock *lock;
+	struct mcs_spinlock nodes[NTHREADS];
+	#define init()
+	#define nondet()
+	#define acquire() mcs_spin_lock(&lock, get_node(tid))
+	#define release() mcs_spin_unlock(&lock, get_node(tid))
 #endif
 static void *get_node(int cpu) { return &nodes[cpu]; }
 
@@ -137,27 +137,27 @@ static void *get_node(int cpu) { return &nodes[cpu]; }
 static int x = 0, y = 0;
 static void* run(void *arg)
 {
-  tid = (intptr_t)arg;
-  int rpt = REPEAT;
+	tid = (intptr_t)arg;
+	int rpt = REPEAT;
 again:
-  acquire();
+	acquire();
 	WRITE_ONCE(x, READ_ONCE(x)+1); /* GenMC has issues here */
-  WRITE_ONCE(y, READ_ONCE(y)+1); /* if these are plain accesses. */
-  release();
-  if (tid < REACQUIRE && rpt--)
-    goto again;
-  return NULL;
+	WRITE_ONCE(y, READ_ONCE(y)+1); /* if these are plain accesses. */
+	release();
+	if (tid < REACQUIRE && rpt--)
+		goto again;
+	return NULL;
 }
 
 int main()
 {
-    pthread_t t[NTHREADS];
-    init();
-    for (intptr_t i = 0; i < NTHREADS; i++)
-        pthread_create(t+i, 0, run, (void*)i);
-    nondet();
-    for (intptr_t i = 0; i < NTHREADS; i++)
-        pthread_join(t[i], NULL);
-    assert (x == y && x == NTHREADS+(REPEAT*REACQUIRE));
-    return 0;
+	pthread_t t[NTHREADS];
+	init();
+	for (intptr_t i = 0; i < NTHREADS; i++)
+		pthread_create(t+i, 0, run, (void*)i);
+	nondet();
+	for (intptr_t i = 0; i < NTHREADS; i++)
+		pthread_join(t[i], NULL);
+	assert (x == y && x == NTHREADS+(REPEAT*REACQUIRE));
+	return 0;
 }
