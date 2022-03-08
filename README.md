@@ -2,19 +2,15 @@
 
 Questions: `diogo.behrens@huawei.com`, `antonio.paolillo@huawei.com`
 
-There are several issues that occur with GenMC 0.7 here. Among them:
+There are still some issues occuring with GenMC 0.8:
 
 1.	wmb/rmb races, safety things: we have discussed this in previous tickets
-2.	GenMC 0.7 runs out of memory
-3.	Issues with atomic_add(-PENDING+LOCKED)
+2.	atomic_andnot and __VERIFIER_atomicrmw_noret
 
-Here is how I usually verify this code.
+How to verify this code:
 
 ```
 genmc -mo -lkmm -check-liveness \
-    -disable-load-annotation \
-    -disable-cast-elimination \
-    -disable-code-condenser \
     -disable-spin-assume \
     -nthreads 6  \
     -- \
@@ -25,28 +21,21 @@ genmc -mo -lkmm -check-liveness \
     client-code.c
 ```
 
-## out-of-memory:
-To make genmc run out-of-memory define COND_LOAD_RLX. This makes qspinlock use the expected relaxed cond_loads. We replaced them with cond_load_acquire otherwise genmc crashes.
+## atomic_andnot:
+
+In `include/linux/atomic.h`, we define `atomic_andnot` which is used in qspinlock's `clear_pending` function.
+`atomic_andnot` should be a non-returning atomic. But if I define `atomic_andnot` with `__VERIFIER_atomicrmw_noret`, then GenMC reports mutual exclusion violation of qspinlock with 4 threads: 
 
 ```
 genmc -mo -lkmm -check-liveness \
-    -disable-load-annotation \
-    -disable-cast-elimination \
-    -disable-code-condenser \
     -disable-spin-assume \
     -nthreads 6  \
     -- \
     -Iinclude \
     -DNTHREADS=4 \
-    -DREACQUIRE=0 \
     -DALGORITHM=2 \
-    -DCOND_LOAD_RLX \
     client-code.c
 ```
-
-## atomic_add:
-
-I had to replace the atomic_add definition from lkmm.h (see include/linux/atomic.h). It seems some issue with signed/unsigned.
 
 ## CNA verification:
 
