@@ -45,6 +45,7 @@
 /* GenMC runs out of memory if cond_load_relaxed are really relaxed. Therefore,
  * we replace them by default with cond_load_acquire.
  * Define COND_LOAD_RLX to disable that */
+#define COND_LOAD_RLX
 #ifndef COND_LOAD_RLX 
 #define COND_LOAD_ACQUIRE
 #endif
