@@ -7,25 +7,8 @@
   #define atomic_or(i, v)      ((void)__atomic_fetch_or(&(v)->counter, i, __ATOMIC_RELAXED))
   #define atomic_andnot(i, v)  ((void)__atomic_fetch_and(&(v)->counter, ~(i), __ATOMIC_RELAXED))
 
-#elif !defined(GENMC_DEV)
-  /* fixes necessary for GenMC 0.7 */
-  #include <lkmm.h>
-  //#define smp_acquire__after_ctrl_dep() smp_rmb()  
-  #define smp_acquire__after_ctrl_dep() smp_mb()  
-  #undef atomic_cmpxchg_relaxed
-  #define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n) 
-  #define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
- 
-  #undef atomic_add
-  #define atomic_add(i, v) ((int32_t)(i) >= 0 ? \
-	  (__atomic_add( (i), v, memory_order_relaxed)): \
-	  (__atomic_sub(-(i), v, memory_order_relaxed)))
-
-  #define atomic_or(i, v)           ((void)__atomic_fetch_or(&(v)->counter, i, memory_order_relaxed))
-  #define atomic_andnot(i, v)       ((void)__atomic_fetch_and(&(v)->counter, ~(i), memory_order_relaxed))
-
 #else
-  /* fixes necessary for GenMC 0.7.* (dev) */
+  /* fixes for GenMC 0.8 */
   #include <genmc_internal.h>
   #include <lkmm.h>
   
