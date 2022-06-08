@@ -117,6 +117,7 @@ static void __init cna_init_nodes_per_cpu(unsigned int cpu)
 	int numa_node = cpu_to_node(cpu);
 	int i;
 
+    __VERIFIER_loop_bound(MAX_NODES+1);
 	for (i = 0; i < MAX_NODES; i++) {
 		struct cna_node *cn = (struct cna_node *)grab_mcs_node(base, i);
 
@@ -142,13 +143,14 @@ static int __init cna_init_nodes(void)
 	/* we store an ecoded tail word in the node's @locked field */
 	BUILD_BUG_ON(sizeof(u32) > sizeof(unsigned int));
 
+    __VERIFIER_loop_bound(NTHREADS+1);
 	for_each_possible_cpu(cpu)
 		cna_init_nodes_per_cpu(cpu);
 
 	return 0;
 }
 
-static __always_inline void cna_init_node(struct mcs_spinlock *node)
+static inline void cna_init_node(struct mcs_spinlock *node)
 {
 	bool priority = !in_task() || irqs_disabled() || rt_task(current);
 	struct cna_node *cn = (struct cna_node *)node;
@@ -306,7 +308,7 @@ static int cna_order_queue(struct mcs_spinlock *node)
 #define LOCK_IS_BUSY(lock) (atomic_read(&(lock)->val) & _Q_LOCKED_PENDING_MASK)
 
 /* Abuse the pv_wait_head_or_lock() hook to get some work done */
-static __always_inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
+static inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
 						 struct mcs_spinlock *node)
 {
 	struct cna_node *cn = (struct cna_node *)node;

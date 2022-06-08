@@ -137,38 +137,36 @@ static void *get_node(int cpu) { return &nodes[cpu]; }
  * Client code
  ******************************************************************************/
 static int x = 0, y = 0;
-static void* run(void *arg)
+
+int rx, ry;
+
+static void* P0(void *arg)
 {
-	tid = (intptr_t)arg;
-//	int rpt = REPEAT;
-//again:
-	acquire();
-	WRITE_ONCE(x, READ_ONCE(x)+1); /* GenMC has issues here */
-	WRITE_ONCE(y, READ_ONCE(y)+1); /* if these are plain accesses. */
-	release();
-//	if (tid < REACQUIRE && rpt--)
-//		goto again;
-	return NULL;
+    tid = (intptr_t)arg;
+    ry = READ_ONCE(y);
+    release();
+    acquire();
+    rx = READ_ONCE(x);
+    return NULL;
+}
+
+static void* P1(void *arg)
+{
+    tid = (intptr_t)arg;
+    WRITE_ONCE(x, 1);
+    smp_wmb();
+    WRITE_ONCE(y, 1);
+    return NULL;
 }
 
 int main()
 {
-	pthread_t t0, t1, t2, t3;
-	init();
-    pthread_create(&t0, 0, run, (void*)0);
-    pthread_create(&t1, 0, run, (void*)1);
-    pthread_create(&t2, 0, run, (void*)2);
-    pthread_create(&t3, 0, run, (void*)3);
-//	for (intptr_t i = 0; i < NTHREADS; i++)
-//		pthread_create(t+i, 0, run, (void*)i);
-	nondet();
+    pthread_t t0, t1;
+    init();
+    pthread_create(&t0, 0, P0, (void*)0);
+    pthread_create(&t1, 0, P1, (void*)1);
     pthread_join(t0, NULL);
     pthread_join(t1, NULL);
-    pthread_join(t2, NULL);
-    pthread_join(t3, NULL);
-//	for (intptr_t i = 0; i < NTHREADS; i++)
-//		pthread_join(t[i], NULL);
-//	assert (x == y && x == NTHREADS+(REPEAT*REACQUIRE));
-    assert (x == y);
-	return 0;
+    assert (!(rx == 0 && ry ==1));
+    return 0;
 }
