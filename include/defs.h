@@ -39,4 +39,7 @@
 #define pr_info(X)
 #define __setup(A,B)
 
+/* needed to run dartagnan using macOS */
+#define __always_inline inline
+
 #endif

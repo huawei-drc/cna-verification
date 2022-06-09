@@ -150,7 +150,7 @@ struct mcs_spinlock *grab_mcs_node(struct mcs_spinlock *base, int idx)
  *
  * *,1,* -> *,0,*
  */
-static inline void clear_pending(struct qspinlock *lock)
+static __always_inline void clear_pending(struct qspinlock *lock)
 {
 	WRITE_ONCE(lock->pending, 0);
 }
@@ -163,7 +163,7 @@ static inline void clear_pending(struct qspinlock *lock)
  *
  * Lock stealing is not allowed if this function is used.
  */
-static inline void clear_pending_set_locked(struct qspinlock *lock)
+static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
 {
 	WRITE_ONCE(lock->locked_pending, _Q_LOCKED_VAL);
 }
@@ -178,7 +178,7 @@ static inline void clear_pending_set_locked(struct qspinlock *lock)
  *
  * p,*,* -> n,*,* ; prev = xchg(lock, node)
  */
-static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
+static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
 {
 	/*
 	 * We can use relaxed semantics since the caller ensures that the
@@ -196,7 +196,7 @@ static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
  *
  * *,1,* -> *,0,*
  */
-static inline void clear_pending(struct qspinlock *lock)
+static __always_inline void clear_pending(struct qspinlock *lock)
 {
 #ifdef DARTAGNAN
     atomic_fetch_andnot_release(_Q_PENDING_VAL, &lock->val);
@@ -211,7 +211,7 @@ static inline void clear_pending(struct qspinlock *lock)
  *
  * *,1,0 -> *,0,1
  */
-static inline void clear_pending_set_locked(struct qspinlock *lock)
+static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
 {
 #ifdef DARTAGNAN
     atomic_fetch_add_release(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
@@ -230,7 +230,7 @@ static inline void clear_pending_set_locked(struct qspinlock *lock)
  *
  * p,*,* -> n,*,* ; prev = xchg(lock, node)
  */
-static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
+static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
 {
 	u32 old, new, val = atomic_read(&lock->val);
 
@@ -263,7 +263,7 @@ static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
  * *,*,* -> *,1,*
  */
 #ifndef queued_fetch_set_pending_acquire
-static inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lock)
+static __always_inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lock)
 {
 #ifdef DARTAGNAN
 	return atomic_fetch_or_release(_Q_PENDING_VAL, &lock->val);
@@ -279,7 +279,7 @@ static inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lock)
  *
  * *,*,0 -> *,0,1
  */
-static inline void set_locked(struct qspinlock *lock)
+static __always_inline void set_locked(struct qspinlock *lock)
 {
 #ifdef VERIFICATION
 	atomic_or(_Q_LOCKED_VAL, &lock->val);
@@ -294,12 +294,12 @@ static inline void set_locked(struct qspinlock *lock)
  * all the PV callbacks.
  */
 
-static inline void __pv_init_node(struct mcs_spinlock *node) { }
-static inline void __pv_wait_node(struct mcs_spinlock *node,
+static __always_inline void __pv_init_node(struct mcs_spinlock *node) { }
+static __always_inline void __pv_wait_node(struct mcs_spinlock *node,
 					   struct mcs_spinlock *prev) { }
-static inline void __pv_kick_node(struct qspinlock *lock,
+static __always_inline void __pv_kick_node(struct qspinlock *lock,
 					   struct mcs_spinlock *node) { }
-static inline u32  __pv_wait_head_or_lock(struct qspinlock *lock,
+static __always_inline u32  __pv_wait_head_or_lock(struct qspinlock *lock,
 						   struct mcs_spinlock *node)
 						   { return 0; }
 
@@ -321,7 +321,7 @@ static inline u32  __pv_wait_head_or_lock(struct qspinlock *lock,
  * @val: Current value of the lock
  * @node: Pointer to the MCS node of the lock holder
  */
-static inline bool __try_clear_tail(struct qspinlock *lock,
+static __always_inline bool __try_clear_tail(struct qspinlock *lock,
 					     u32 val,
 					     struct mcs_spinlock *node)
 {

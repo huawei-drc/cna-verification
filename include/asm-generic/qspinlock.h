@@ -19,7 +19,7 @@
  * @lock: Pointer to queued spinlock structure
  * Return: 1 if it is locked, 0 otherwise
  */
-static inline int queued_spin_is_locked(struct qspinlock *lock)
+static __always_inline int queued_spin_is_locked(struct qspinlock *lock)
 {
 	/*
 	 * Any !0 state indicates it is locked, even if _Q_LOCKED_VAL
@@ -39,7 +39,7 @@ static inline int queued_spin_is_locked(struct qspinlock *lock)
  *      code and change things underneath the lock. This also allows some
  *      optimizations to be applied without conflict with lockref.
  */
-static inline int queued_spin_value_unlocked(struct qspinlock lock)
+static __always_inline int queued_spin_value_unlocked(struct qspinlock lock)
 {
 	return !atomic_read(&lock.val);
 }
@@ -49,7 +49,7 @@ static inline int queued_spin_value_unlocked(struct qspinlock lock)
  * @lock : Pointer to queued spinlock structure
  * Return: 1 if lock contended, 0 otherwise
  */
-static inline int queued_spin_is_contended(struct qspinlock *lock)
+static __always_inline int queued_spin_is_contended(struct qspinlock *lock)
 {
 	return atomic_read(&lock->val) & ~_Q_LOCKED_MASK;
 }
@@ -58,7 +58,7 @@ static inline int queued_spin_is_contended(struct qspinlock *lock)
  * @lock : Pointer to queued spinlock structure
  * Return: 1 if lock acquired, 0 if failed
  */
-static inline int queued_spin_trylock(struct qspinlock *lock)
+static __always_inline int queued_spin_trylock(struct qspinlock *lock)
 {
 	int val = atomic_read(&lock->val);
 
@@ -75,7 +75,7 @@ extern void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
  * queued_spin_lock - acquire a queued spinlock
  * @lock: Pointer to queued spinlock structure
  */
-static inline void queued_spin_lock(struct qspinlock *lock)
+static __always_inline void queued_spin_lock(struct qspinlock *lock)
 {
 	int val = 0;
 
@@ -91,7 +91,7 @@ static inline void queued_spin_lock(struct qspinlock *lock)
  * queued_spin_unlock - release a queued spinlock
  * @lock : Pointer to queued spinlock structure
  */
-static inline void queued_spin_unlock(struct qspinlock *lock)
+static __always_inline void queued_spin_unlock(struct qspinlock *lock)
 {
 	/*
 	 * unlock() needs release semantics:
@@ -105,7 +105,7 @@ static inline void queued_spin_unlock(struct qspinlock *lock)
 #endif
 
 #ifndef virt_spin_lock
-static inline bool virt_spin_lock(struct qspinlock *lock)
+static __always_inline bool virt_spin_lock(struct qspinlock *lock)
 {
 	return false;
 }

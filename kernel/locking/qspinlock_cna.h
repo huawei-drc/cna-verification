@@ -150,7 +150,7 @@ static int __init cna_init_nodes(void)
 	return 0;
 }
 
-static inline void cna_init_node(struct mcs_spinlock *node)
+static __always_inline void cna_init_node(struct mcs_spinlock *node)
 {
 	bool priority = !in_task() || irqs_disabled() || rt_task(current);
 	struct cna_node *cn = (struct cna_node *)node;
@@ -308,7 +308,7 @@ static int cna_order_queue(struct mcs_spinlock *node)
 #define LOCK_IS_BUSY(lock) (atomic_read(&(lock)->val) & _Q_LOCKED_PENDING_MASK)
 
 /* Abuse the pv_wait_head_or_lock() hook to get some work done */
-static inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
+static __always_inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
 						 struct mcs_spinlock *node)
 {
 	struct cna_node *cn = (struct cna_node *)node;
