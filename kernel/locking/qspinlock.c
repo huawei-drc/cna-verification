@@ -198,7 +198,11 @@ static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
  */
 static inline void clear_pending(struct qspinlock *lock)
 {
-	atomic_andnot(_Q_PENDING_VAL, &lock->val);
+#ifdef DARTAGNAN
+    atomic_fetch_andnot_release(_Q_PENDING_VAL, &lock->val);
+#else
+    atomic_andnot(_Q_PENDING_VAL, &lock->val);
+#endif
 }
 
 /**
@@ -209,7 +213,11 @@ static inline void clear_pending(struct qspinlock *lock)
  */
 static inline void clear_pending_set_locked(struct qspinlock *lock)
 {
+#ifdef DARTAGNAN
+    atomic_fetch_add_release(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
+#else
 	atomic_add(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
+#endif
 }
 
 /**
@@ -233,7 +241,11 @@ static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
 		 * the MCS node is properly initialized before updating the
 		 * tail.
 		 */
-		old = atomic_cmpxchg_relaxed(&lock->val, val, new);
+#ifdef DARTAGNAN
+        old = atomic_cmpxchg_release(&lock->val, val, new);
+#else
+        old = atomic_cmpxchg_relaxed(&lock->val, val, new);
+#endif
 		if (old == val)
 			break;
 
@@ -253,7 +265,11 @@ static inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
 #ifndef queued_fetch_set_pending_acquire
 static inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lock)
 {
-	return atomic_fetch_or_acquire(_Q_PENDING_VAL, &lock->val);
+#ifdef DARTAGNAN
+	return atomic_fetch_or_release(_Q_PENDING_VAL, &lock->val);
+#else
+    return atomic_fetch_or_acquire(_Q_PENDING_VAL, &lock->val);
+#endif
 }
 #endif
 
@@ -389,6 +405,9 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 	 * 0,0,* -> 0,1,* -> 0,0,1 pending, trylock
 	 */
 	val = queued_fetch_set_pending_acquire(lock);
+#ifdef DARTAGNAN
+    smp_mb();
+#endif
 
 	/*
 	 * If we observe contention, there is a concurrent locker.
