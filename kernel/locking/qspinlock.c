@@ -333,7 +333,7 @@ static __always_inline bool __try_clear_tail(struct qspinlock *lock,
  * @node: Pointer to the MCS node of the lock holder
  * @next: Pointer to the MCS node of the first waiter in the MCS queue
  */
-static inline void __mcs_lock_handoff(struct mcs_spinlock *node,
+static __always_inline void __mcs_lock_handoff(struct mcs_spinlock *node,
 					       struct mcs_spinlock *next)
 {
 	arch_mcs_lock_handoff(&next->locked, 1);
