@@ -198,7 +198,7 @@ static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
  */
 static __always_inline void clear_pending(struct qspinlock *lock)
 {
-#ifdef DARTAGNAN
+#ifdef DARTAGNAN4
     atomic_fetch_andnot_release(_Q_PENDING_VAL, &lock->val);
 #else
     atomic_andnot(_Q_PENDING_VAL, &lock->val);
@@ -213,7 +213,7 @@ static __always_inline void clear_pending(struct qspinlock *lock)
  */
 static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
 {
-#ifdef DARTAGNAN
+#ifdef DARTAGNAN3
     atomic_fetch_add_release(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
 #else
 	atomic_add(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
@@ -241,7 +241,7 @@ static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
 		 * the MCS node is properly initialized before updating the
 		 * tail.
 		 */
-#ifdef DARTAGNAN
+#ifdef DARTAGNAN1
         old = atomic_cmpxchg_release(&lock->val, val, new);
 #else
         old = atomic_cmpxchg_relaxed(&lock->val, val, new);
@@ -265,7 +265,7 @@ static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
 #ifndef queued_fetch_set_pending_acquire
 static __always_inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lock)
 {
-#ifdef DARTAGNAN
+#ifdef DARTAGNAN2
 	return atomic_fetch_or_release(_Q_PENDING_VAL, &lock->val);
 #else
     return atomic_fetch_or_acquire(_Q_PENDING_VAL, &lock->val);
@@ -405,7 +405,7 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 	 * 0,0,* -> 0,1,* -> 0,0,1 pending, trylock
 	 */
 	val = queued_fetch_set_pending_acquire(lock);
-#ifdef DARTAGNAN
+#ifdef DARTAGNAN2
     smp_mb();
 #endif
 
@@ -513,9 +513,13 @@ pv_queue:
 	 * publish the updated tail via xchg_tail() and potentially link
 	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
 	 */
-	smp_wmb();
+#ifdef VERIFICATION
+    smp_mb();
+#else
+    smp_wmb();
+#endif
 
-	/*
+    /*
 	 * Publish the updated tail.
 	 * We have already touched the queueing cacheline; don't bother with
 	 * pending stuff.
