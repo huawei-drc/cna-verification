@@ -169,6 +169,6 @@ int main()
 //	for (intptr_t i = 0; i < NTHREADS; i++)
 //		pthread_join(t[i], NULL);
 //	assert (x == y && x == NTHREADS+(REPEAT*REACQUIRE));
-    assert (x == y);
+    assert (READ_ONCE(x) == READ_ONCE(y));
 	return 0;
 }
