@@ -513,7 +513,7 @@ pv_queue:
 	 * publish the updated tail via xchg_tail() and potentially link
 	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
 	 */
-#ifdef VERIFICATION
+#if defined(VERIFICATION) && !defined(DARTAGNAN5)
     smp_mb();
 #else
     smp_wmb();
