@@ -489,7 +489,7 @@ pv_queue:
 	 */
 	barrier();
 
-#ifdef VERIFICATION
+#if defined(VERIFICATION) && !defined(DARTAGNAN6)
 	WRITE_ONCE(node->locked, 0);
 	WRITE_ONCE(node->next, NULL);
 #else
