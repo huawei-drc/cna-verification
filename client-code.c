@@ -159,16 +159,14 @@ int main()
     pthread_create(&t1, 0, run, (void*)1);
     pthread_create(&t2, 0, run, (void*)2);
     pthread_create(&t3, 0, run, (void*)3);
-//	for (intptr_t i = 0; i < NTHREADS; i++)
-//		pthread_create(t+i, 0, run, (void*)i);
-	nondet();
+
+    nondet();
+
     pthread_join(t0, NULL);
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
     pthread_join(t3, NULL);
-//	for (intptr_t i = 0; i < NTHREADS; i++)
-//		pthread_join(t[i], NULL);
-//	assert (x == y && x == NTHREADS+(REPEAT*REACQUIRE));
+
     assert (READ_ONCE(x) == READ_ONCE(y));
 	return 0;
 }
