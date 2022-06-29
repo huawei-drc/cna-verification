@@ -489,7 +489,7 @@ pv_queue:
 	 */
 	barrier();
 
-#if defined(VERIFICATION) && !defined(DARTAGNAN6)
+#ifdef DARTAGNAN6
 	WRITE_ONCE(node->locked, 0);
 	WRITE_ONCE(node->next, NULL);
 #else
@@ -513,7 +513,7 @@ pv_queue:
 	 * publish the updated tail via xchg_tail() and potentially link
 	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
 	 */
-#if defined(VERIFICATION) && !defined(DARTAGNAN5)
+#ifdef DARTAGNAN5
     smp_mb();
 #else
     smp_wmb();
