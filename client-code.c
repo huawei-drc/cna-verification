@@ -132,14 +132,12 @@ static int x = 0, y = 0;
 static void* run(void *arg)
 {
 	tid = (intptr_t)arg;
-//	int rpt = REPEAT;
-//again:
+
 	acquire();
-	WRITE_ONCE(x, READ_ONCE(x)+1); /* GenMC has issues here */
-	WRITE_ONCE(y, READ_ONCE(y)+1); /* if these are plain accesses. */
+	x = x + 1;
+	y = y + 1;
 	release();
-//	if (tid < REACQUIRE && rpt--)
-//		goto again;
+
 	return NULL;
 }
 
