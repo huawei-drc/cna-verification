@@ -1,27 +1,8 @@
 #ifndef ATOMIC_H
 #define ATOMIC_H
 
-#ifdef MOCK_LKMM /* to debug issues with LKMM mapping of genmc while using IMM */
-	#include "lkmm-mock.h"
-//	#define atomic_or(i, v)      ((void)__atomic_fetch_or(&(v)->counter, i, __ATOMIC_RELAXED))
-//	#define atomic_andnot(i, v)  ((void)__atomic_fetch_and(&(v)->counter, ~(i), __ATOMIC_RELAXED))
-#else   /* fixes for GenMC 0.8 */
-//	#include <genmc_internal.h>
-	#include <lkmm.h>
-	#define smp_acquire__after_ctrl_dep() smp_rmb()
-//	#undef atomic_cmpxchg_relaxed
-//	#define atomic_cmpxchg_relaxed(x, o, n) cmpxchg_relaxed(&(x)->counter, (int) o, n)
-//	#define atomic_fetch_or_acquire(i, v)  __atomic_fetch_or(&(v)->counter, i, memory_order_acquire)
-//	#define atomic_or(i, v)  do {							\
-//		__VERIFIER_atomicrmw_noret();						\
-//		atomic_fetch_or_explicit(&(v)->counter, i, memory_order_relaxed);	\
-//	} while(0)
-//	#define atomic_andnot(i, v) do {						\
-//		(void) __VERIFIER_atomicrmw_noret();					\
-//		atomic_fetch_and_explicit(&(v)->counter, ~(i), memory_order_relaxed);	\
-//	} while(0)
-#endif
-
+#include <lkmm.h>
+#define smp_acquire__after_ctrl_dep() smp_rmb()
 
 #define __atomic_try_cmpxchg(x, o, n, mo) ({         \
 	typeof(*o) r;                                \
