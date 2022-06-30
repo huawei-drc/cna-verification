@@ -42,14 +42,6 @@
  */ 
 #define SPIN_ANNOTATION
 
-/* GenMC runs out of memory if cond_load_relaxed are really relaxed. Therefore,
- * we replace them by default with cond_load_acquire.
- * Define COND_LOAD_RLX to disable that */
-#define COND_LOAD_RLX
-#ifndef COND_LOAD_RLX 
-#define COND_LOAD_ACQUIRE
-#endif
-
 /*******************************************************************************
  * Includes, context, lock selection -- NO USER OPTIONS FROM HERE ON.
  ******************************************************************************/
@@ -154,19 +146,21 @@ static void* run(void *arg)
 int main()
 {
 	pthread_t t0, t1, t2, t3;
+
 	init();
-    pthread_create(&t0, 0, run, (void*)0);
-    pthread_create(&t1, 0, run, (void*)1);
-    pthread_create(&t2, 0, run, (void*)2);
-    pthread_create(&t3, 0, run, (void*)3);
 
-    nondet();
+    	pthread_create(&t0, 0, run, (void*)0);
+    	pthread_create(&t1, 0, run, (void*)1);
+    	pthread_create(&t2, 0, run, (void*)2);
+    	pthread_create(&t3, 0, run, (void*)3);
 
-    pthread_join(t0, NULL);
-    pthread_join(t1, NULL);
-    pthread_join(t2, NULL);
-    pthread_join(t3, NULL);
+    	nondet();
 
-    assert (READ_ONCE(x) == READ_ONCE(y));
+    	pthread_join(t0, NULL);
+    	pthread_join(t1, NULL);
+    	pthread_join(t2, NULL);
+    	pthread_join(t3, NULL);
+
+    	assert (READ_ONCE(x) == READ_ONCE(y));
 	return 0;
 }
