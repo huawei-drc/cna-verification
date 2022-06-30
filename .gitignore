@@ -6,3 +6,4 @@ atomify.diff
 .patch.applied
 .patch.prepared
 *.ll
+*.diff

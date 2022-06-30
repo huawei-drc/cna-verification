@@ -133,6 +133,7 @@ verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok
 ###############################################################################
 PATCH_PREP_FILE = .patch.prepared
 NEW_VERIF_PATCH = $(VERIF_PATCH).new
+PATCH_BASE ?= HEAD~1
 
 $(PATCH_PREP_FILE):
 	git checkout -b patch-branch
@@ -146,7 +147,7 @@ $(PATCH_PREP_FILE):
 patch_prepare: $(PATCH_PREP_FILE)
 
 patch_create: $(PATCH_PREP_FILE)
-	git diff HEAD~1 > $(NEW_VERIF_PATCH)
+	git diff $(PATH_BASE) > $(NEW_VERIF_PATCH)
 
 patch_update: patch_create
 	make patch_abort
