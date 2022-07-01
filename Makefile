@@ -1,9 +1,9 @@
 # Copyright (c) 2021 Diogo Behrens, Antonio Paolillo
 # SPDX-License-Identifier: MIT
 
-all: verification
+all: prepared
 
-default: verification
+default: prepared
 
 help:
 	@echo "Goals:"
@@ -11,7 +11,7 @@ help:
 	@echo "	cna_patch       apply CNA patch"
 	@echo "	verif_patch     apply verification patch"
 	@echo "	empty_headers   create supporting empty headers"
-	@echo "	verification    verify qspinlock_cna with GenMC"
+	@echo "	prepared    	apply all patches and be ready for verification"
 
 ###############################################################################
 # Step 1: get qspinlock files from kernel
@@ -89,35 +89,9 @@ $(EMPTY_HEADERS): %:
 .PHONY: empty_headers
 empty_headers: $(EMPTY_HEADERS)
 
-###############################################################################
-# Step 5: GenMC verification
-###############################################################################
 .PHONY: prepared
 prepared: $(VERIF_FILE) $(EMPTY_HEADERS)
 
-GENMC_OPTS = -mo -lkmm -check-liveness \
-	-disable-race-detection \
-	-disable-load-annotation \
-	-disable-cast-elimination \
-	-disable-code-condenser \
-	-disable-spin-assume
-INCLUDES = -I/usr/share/genmc/include -Iinclude
-CLIENT   = client-code.c
-
-qspinlock_cna.ok: prepared
-	genmc $(GENMC_OPTS) -- $(INCLUDES) \
-		-DNTHREADS=4 -DALGORITHM=1 $(CLIENT) > $(@:.ok=.log) 2>&1 && touch $@
-
-qspinlock_mcs.ok: prepared
-	genmc $(GENMC_OPTS) -- $(INCLUDES) \
-		-DNTHREADS=3 -DALGORITHM=2 $(CLIENT) > $(@:.ok=.log) 2>&1 && touch $@
-
-mcs_spinlock.ok: prepared
-	genmc $(GENMC_OPTS) -- $(INCLUDES) \
-		-DNTHREADS=3 -DALGORITHM=3 $(CLIENT) > $(@:.ok=.log) 2>&1 && touch $@
-
-.PHONY: verification
-verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok
 
 ###############################################################################
 # Patch creation targets
@@ -133,32 +107,25 @@ verification: mcs_spinlock.ok qspinlock_mcs.ok qspinlock_cna.ok
 ###############################################################################
 PATCH_PREP_FILE = .patch.prepared
 NEW_VERIF_PATCH = $(VERIF_PATCH).new
-PATCH_BASE ?= HEAD~1
+PATCH_BASE ?= HEAD
 
 $(PATCH_PREP_FILE):
 	git checkout -b patch-branch
 	make linux_files cna_patch empty_headers
 	git add include kernel
 	git commit -m"applied cna patch"
-	make verif_patch
-	git add include kernel
-	git commit -m"applied old verification patch"
 	touch $@
 patch_prepare: $(PATCH_PREP_FILE)
 
-patch_create: $(PATCH_PREP_FILE)
+patch_update: $(PATCH_PREP_FILE)
 	git diff $(PATH_BASE) > $(NEW_VERIF_PATCH)
-
-patch_update: patch_create
-	make patch_abort
-	mv $(NEW_VERIF_PATCH) $(VERIF_FILE)
 
 patch_abort: clean
 	git reset --hard
 	git checkout master
 	git branch -D patch-branch
 
-.PHONY: patch_prepare patch_create patch_update patch_abort
+.PHONY: patch_prepare patch_update patch_abort
 ###############################################################################
 # Other goals
 ###############################################################################
