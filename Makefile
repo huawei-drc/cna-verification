@@ -63,7 +63,20 @@ $(VERIF_FILE): $(VERIF_PATCH) $(CNA_FILE)
 verif_patch: $(VERIF_FILE)
 
 ###############################################################################
-# Step 4: create a bunch of empty header files to make qspinlock happy
+# Step 4: apply lkmm fixes patch
+###############################################################################
+FIXES_PATCH = lkmm-fixes.patch
+FIXES_FILE  = .fixes.applied
+
+$(FIXES_FILE): $(FIXES_PATCH) $(VERIF_FILE)
+	patch -p1 < $(FIXES_PATCH)
+	@touch $@
+
+.PHONY: fixes_patch
+fixes_patch: $(FIXES_FILE)
+
+###############################################################################
+# Step 5: create a bunch of empty header files to make qspinlock happy
 ###############################################################################
 EMPTY_HEADERS = \
 	include/linux/hardirq.h \
@@ -90,7 +103,7 @@ $(EMPTY_HEADERS): %:
 empty_headers: $(EMPTY_HEADERS)
 
 .PHONY: prepared
-prepared: $(VERIF_FILE) $(EMPTY_HEADERS)
+prepared: $(FIXES_FILE) $(EMPTY_HEADERS)
 
 
 ###############################################################################
@@ -131,7 +144,7 @@ patch_abort: clean
 ###############################################################################
 .PHONY: clean
 clean:
-	rm -rf $(EMPTY_HEADERS) $(LINUX_FILES) $(CNA_FILE) $(VERIF_FILE) \
+	rm -rf $(EMPTY_HEADERS) $(LINUX_FILES) $(CNA_FILE) $(VERIF_FILE) $(FIXES_FILE) \
 		$(CNA_PATCH_DIR) $(PATCH_PREP_FILE) $(NEW_VERIF_PATCH) \
 		*.ok *.log
 	find . -empty -type d -delete
