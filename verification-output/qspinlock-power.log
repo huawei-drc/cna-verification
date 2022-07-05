@@ -1,0 +1,547 @@
+❯ export CFLAGS="-I$DAT3M_HOME/include -I$CNA_VERIFICATION_HOME/include -DNTHREADS=4 -DALGORITHM=2 -DSKIP_PENDING"
+
+❯ java -jar dartagnan/target/dartagnan-3.0.0.jar cat/power.cat  --target=power --bound=1 --program.processing.constantPropagation=false ../cna-verification/client-code.c --refinement.baseline=no_oota,uniproc,atomic_rmw --property=reachability,liveness
+[01.07.2022] 08:53:26 [INFO] GitInfo.CreateGitInfo - Git branch: cna-verification
+[01.07.2022] 08:53:26 [INFO] GitInfo.CreateGitInfo - Git commit ID: 1ffb04cadda8c7628e16cb937e9aca847e59d257
+[01.07.2022] 08:53:26 [INFO] GlobalSettings.LogGlobalSettings - ARCH_PRECISION: 64
+[01.07.2022] 08:53:26 [INFO] GlobalSettings.LogGlobalSettings - ATOMIC_AS_LOCK: false
+[01.07.2022] 08:53:26 [INFO] GlobalSettings.LogGlobalSettings - REFINEMENT_GENERATE_GRAPHVIZ_DEBUG_FILES: false
+[01.07.2022] 08:53:26 [INFO] GlobalSettings.LogGlobalSettings - REFINEMENT_SYMMETRY_LEARNING: FULL
+[01.07.2022] 08:53:26 [INFO] Dartagnan.main - Program path: ../cna-verification/client-code.c
+[01.07.2022] 08:53:26 [INFO] Dartagnan.main - CAT file path: cat/power.cat
+[01.07.2022] 08:53:26 [INFO] Compilation.compileWithClang - Compiling with clang
+[01.07.2022] 08:53:28 [INFO] Compilation.compileWithSmack - Compiling with smack
+[01.07.2022] 08:53:29 [INFO] Compilation.compileWithSmack - Compiling with smack
+[01.07.2022] 08:53:30 [INFO] VisitorBoogie.visitLine_comment - SMACK version: 2.8.0 
+[01.07.2022] 08:53:30 [INFO] VisitorBoogie.visitMain - Number of threads (including main): 5
+[01.07.2022] 08:53:31 [INFO] DeadCodeElimination.run - #Events before DCE: 2001
+[01.07.2022] 08:53:31 [INFO] DeadCodeElimination.run - #Events after DCE: 1940
+[01.07.2022] 08:53:31 [INFO] BranchReordering.run - Branches reordered
+[01.07.2022] 08:53:31 [INFO] BranchReordering.run - program.processing.detReordering: true
+[01.07.2022] 08:53:31 [INFO] Simplifier.run - pre-simplification: 1940 events
+[01.07.2022] 08:53:31 [INFO] Simplifier.run - post-simplification: 1432 events
+[01.07.2022] 08:53:31 [INFO] FindSpinLoops.run - # of spinloops: 12
+[01.07.2022] 08:53:31 [INFO] LoopUnrolling.run - Program unrolled 1 times
+[01.07.2022] 08:53:31 [INFO] DeadAssignmentElimination.run - #Events before DSE: 1432
+[01.07.2022] 08:53:31 [INFO] DeadAssignmentElimination.run - #Events after DSE: 1380
+[01.07.2022] 08:53:31 [INFO] RemoveDeadCondJumps.run - #Events before RemoveDeadCondJumps: 1380
+[01.07.2022] 08:53:31 [INFO] RemoveDeadCondJumps.run - #Events after RemoveDeadCondJumps: 1315
+[01.07.2022] 08:53:31 [INFO] Compilation.run - Program compiled to Power
+[01.07.2022] 08:53:31 [INFO] BranchEquivalence.<init> - program.analysis.cf.alwaysSplitOnJump: false
+[01.07.2022] 08:53:31 [INFO] BranchEquivalence.<init> - program.analysis.cf.mergeBranches: true
+[01.07.2022] 08:53:31 [INFO] Dependency.fromConfig - Analyze dependencies
+[01.07.2022] 08:53:31 [INFO] AliasAnalysis.fromConfig - Selected Alias Analysis: FIELD_SENSITIVE
+[01.07.2022] 08:53:31 [INFO] RelCo.getMaxTupleSet - Computing maxTupleSet for co
+[01.07.2022] 08:53:31 [INFO] RelCo.getMaxTupleSet - maxTupleSet size for co: 652
+[01.07.2022] 08:53:31 [INFO] RelRf.getMaxTupleSet - Computing maxTupleSet for rf
+[01.07.2022] 08:53:31 [INFO] RelRf.atomicBlockOptimization - Atomic block optimization eliminated 0 reads
+[01.07.2022] 08:53:31 [INFO] RelRf.getMaxTupleSet - maxTupleSet size for rf: 842
+[01.07.2022] 08:53:32 [INFO] RelRMW.getMaxTupleSet - Computing maxTupleSet for rmw
+[01.07.2022] 08:53:32 [INFO] RelRMW.getMaxTupleSet - maxTupleSet size for rmw: 48
+[01.07.2022] 08:53:32 [INFO] RelCo.getMaxTupleSet - Computing maxTupleSet for co
+[01.07.2022] 08:53:32 [INFO] RelCo.getMaxTupleSet - maxTupleSet size for co: 652
+[01.07.2022] 08:53:32 [INFO] RelRf.getMaxTupleSet - Computing maxTupleSet for rf
+[01.07.2022] 08:53:32 [INFO] RelRf.atomicBlockOptimization - Atomic block optimization eliminated 0 reads
+[01.07.2022] 08:53:32 [INFO] RelRf.getMaxTupleSet - maxTupleSet size for rf: 842
+[01.07.2022] 08:53:32 [INFO] RelRMW.getMaxTupleSet - Computing maxTupleSet for rmw
+[01.07.2022] 08:53:32 [INFO] RelRMW.getMaxTupleSet - maxTupleSet size for rmw: 48
+[01.07.2022] 08:53:32 [INFO] ProgramEncoder.<init> - encoding.allowPartialExecutions: false
+[01.07.2022] 08:53:32 [INFO] ProgramEncoder.<init> - encoding.mergeCFVars: true
+[01.07.2022] 08:53:32 [INFO] SymmetryEncoder.<init> - Breaking symmetry on relation: rf
+[01.07.2022] 08:53:32 [INFO] SymmetryEncoder.<init> - Breaking by sync degree: true
+[01.07.2022] 08:53:32 [INFO] RelCo.initializeEncoding - encoding.co.antiSymm: false
+[01.07.2022] 08:53:32 [INFO] Acyclic.getEncodeTupleSet - Computing encodeTupleSet for acyclic (((po-loc+rf)+co)+fr)
+[01.07.2022] 08:53:32 [INFO] Acyclic.getEncodeTupleSet - encodeTupleSet size 2108
+[01.07.2022] 08:53:32 [INFO] Acyclic.getEncodeTupleSet - reduced encodeTupleSet size 1996
+[01.07.2022] 08:53:32 [INFO] Acyclic.getEncodeTupleSet - Computing encodeTupleSet for acyclic ((ctrl+(data+addr))+rf)
+[01.07.2022] 08:53:32 [INFO] Acyclic.getEncodeTupleSet - encodeTupleSet size 1220
+[01.07.2022] 08:53:32 [INFO] Acyclic.getEncodeTupleSet - reduced encodeTupleSet size 928
+[01.07.2022] 08:53:32 [INFO] RefinementTask.initializeEncoders - refinement.baseline: [UNIPROC, NO_OOTA, ATOMIC_RMW]
+[01.07.2022] 08:53:32 [INFO] PropertyEncoder.encodeAssertions - Encoding assertions
+[01.07.2022] 08:53:32 [INFO] PropertyEncoder.encodeLiveness - Encoding liveness
+[01.07.2022] 08:53:32 [INFO] RefinementSolver.run - Starting encoding using Z3 4.8.14.0
+[01.07.2022] 08:53:32 [INFO] ProgramEncoder.encodeMemory - Encoding fixed memory
+[01.07.2022] 08:53:32 [INFO] ProgramEncoder.encodeControlFlow - Encoding program control flow
+[01.07.2022] 08:53:32 [INFO] ProgramEncoder.encodeFinalRegisterValues - Encoding final register values
+[01.07.2022] 08:53:32 [INFO] ProgramEncoder.encodeDependencies - Encoding dependencies
+[01.07.2022] 08:53:32 [INFO] WmmEncoder.encodeRelations - Encoding relations
+[01.07.2022] 08:53:32 [INFO] WmmEncoder.encodeAnarchicSemantics - Encoding anarchic semantics
+[01.07.2022] 08:53:33 [INFO] WmmEncoder.encodeConsistency - Encoding consistency
+[01.07.2022] 08:53:33 [INFO] RefinementSolver.run - Refinement procedure started.
+[01.07.2022] 08:53:43 [DEBUG] RefinementSolver.run - 
+ ===== SMT Statistics (after first iteration) ===== 
+	conflicts -> 2084
+	decisions -> 1927687
+	propagations -> 4247025
+	binary propagations -> 3103007
+	restarts -> 18
+	final checks -> 47
+	added eqs -> 684948
+	mk clause -> 220342
+	del clause -> 156842
+	interface eqs -> 46
+	minimized lits -> 61092
+	num checks -> 1
+	mk bool var -> 402175
+	arith eq adapter -> 59
+	arith-lower -> 20150
+	arith-upper -> 17797
+	arith-fixed-eqs -> 167
+	arith-conflicts -> 128
+	arith-bound-propagations-lp -> 6084
+	arith-diseq -> 148
+	arith-assume-eqs -> 46
+	arith-make-feasible -> 4326
+	arith-max-columns -> 2578
+	arith-max-rows -> 2264
+	arith-offset-eqs -> 289
+	bv diseqs -> 80
+	bv dynamic diseqs -> 5482
+	bv bit2core -> 6633979
+	bv->core eq -> 87882
+	bv dynamic eqs -> 218
+	num allocs -> 16663116
+	rlimit count -> 39701047
+	max memory -> 209.21
+	memory -> 209.2
+	time -> 10.164
+
+[01.07.2022] 08:53:43 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 1 =====
+Solving time(ms): 10176
+[01.07.2022] 08:53:44 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 10
+Population time(ms): 35
+Consistency check time(ms): 1
+Base Reason computation time(ms): 5
+Core Reason computation time(ms): 1
+Model size (#events): 174
+#Computed reasons (base/core): 2/2
+#Computed reduced reasons (base/core): 2/2
+
+[01.07.2022] 08:53:44 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 2 =====
+Solving time(ms): 323
+[01.07.2022] 08:53:44 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 7
+Population time(ms): 19
+Consistency check time(ms): 1
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 188
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:53:52 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 3 =====
+Solving time(ms): 7739
+[01.07.2022] 08:53:52 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 9
+Population time(ms): 18
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 189
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:53:52 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 4 =====
+Solving time(ms): 457
+[01.07.2022] 08:53:52 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 9
+Population time(ms): 28
+Consistency check time(ms): 1
+Base Reason computation time(ms): 1
+Core Reason computation time(ms): 0
+Model size (#events): 197
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:53:53 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 5 =====
+Solving time(ms): 629
+[01.07.2022] 08:53:53 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 26
+Consistency check time(ms): 0
+Base Reason computation time(ms): 7
+Core Reason computation time(ms): 1
+Model size (#events): 216
+#Computed reasons (base/core): 13/9
+#Computed reduced reasons (base/core): 9/7
+
+[01.07.2022] 08:53:53 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 6 =====
+Solving time(ms): 144
+[01.07.2022] 08:53:53 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 7
+Population time(ms): 36
+Consistency check time(ms): 0
+Base Reason computation time(ms): 2
+Core Reason computation time(ms): 1
+Model size (#events): 217
+#Computed reasons (base/core): 6/5
+#Computed reduced reasons (base/core): 5/5
+
+[01.07.2022] 08:53:59 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 7 =====
+Solving time(ms): 5564
+[01.07.2022] 08:53:59 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 13
+Consistency check time(ms): 1
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 212
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:06 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 8 =====
+Solving time(ms): 7251
+[01.07.2022] 08:54:06 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 11
+Population time(ms): 34
+Consistency check time(ms): 0
+Base Reason computation time(ms): 2
+Core Reason computation time(ms): 1
+Model size (#events): 249
+#Computed reasons (base/core): 7/6
+#Computed reduced reasons (base/core): 6/6
+
+[01.07.2022] 08:54:08 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 9 =====
+Solving time(ms): 1470
+[01.07.2022] 08:54:08 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 25
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 1
+Model size (#events): 233
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:11 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 10 =====
+Solving time(ms): 3766
+[01.07.2022] 08:54:12 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 84
+Consistency check time(ms): 1
+Base Reason computation time(ms): 19
+Core Reason computation time(ms): 4
+Model size (#events): 272
+#Computed reasons (base/core): 56/55
+#Computed reduced reasons (base/core): 55/40
+
+[01.07.2022] 08:54:12 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 11 =====
+Solving time(ms): 323
+[01.07.2022] 08:54:12 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 7
+Population time(ms): 53
+Consistency check time(ms): 1
+Base Reason computation time(ms): 1
+Core Reason computation time(ms): 1
+Model size (#events): 272
+#Computed reasons (base/core): 10/8
+#Computed reduced reasons (base/core): 8/8
+
+[01.07.2022] 08:54:18 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 12 =====
+Solving time(ms): 5558
+[01.07.2022] 08:54:18 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 10
+Population time(ms): 59
+Consistency check time(ms): 0
+Base Reason computation time(ms): 8
+Core Reason computation time(ms): 1
+Model size (#events): 258
+#Computed reasons (base/core): 37/33
+#Computed reduced reasons (base/core): 33/25
+
+[01.07.2022] 08:54:18 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 13 =====
+Solving time(ms): 164
+[01.07.2022] 08:54:18 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 32
+Consistency check time(ms): 1
+Base Reason computation time(ms): 1
+Core Reason computation time(ms): 0
+Model size (#events): 258
+#Computed reasons (base/core): 4/3
+#Computed reduced reasons (base/core): 3/3
+
+[01.07.2022] 08:54:18 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 14 =====
+Solving time(ms): 144
+[01.07.2022] 08:54:18 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 32
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 258
+#Computed reasons (base/core): 2/2
+#Computed reduced reasons (base/core): 2/2
+
+[01.07.2022] 08:54:39 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 15 =====
+Solving time(ms): 21236
+[01.07.2022] 08:54:39 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 7
+Population time(ms): 43
+Consistency check time(ms): 0
+Base Reason computation time(ms): 3
+Core Reason computation time(ms): 1
+Model size (#events): 264
+#Computed reasons (base/core): 17/15
+#Computed reduced reasons (base/core): 15/12
+
+[01.07.2022] 08:54:41 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 16 =====
+Solving time(ms): 1834
+[01.07.2022] 08:54:41 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 7
+Population time(ms): 65
+Consistency check time(ms): 0
+Base Reason computation time(ms): 7
+Core Reason computation time(ms): 2
+Model size (#events): 270
+#Computed reasons (base/core): 43/38
+#Computed reduced reasons (base/core): 38/20
+
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 17 =====
+Solving time(ms): 3284
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 16
+Consistency check time(ms): 0
+Base Reason computation time(ms): 1
+Core Reason computation time(ms): 0
+Model size (#events): 234
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 18 =====
+Solving time(ms): 118
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 16
+Consistency check time(ms): 1
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 235
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 19 =====
+Solving time(ms): 126
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 16
+Consistency check time(ms): 0
+Base Reason computation time(ms): 1
+Core Reason computation time(ms): 0
+Model size (#events): 235
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 20 =====
+Solving time(ms): 129
+[01.07.2022] 08:54:45 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 23
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 234
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:47 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 21 =====
+Solving time(ms): 1787
+[01.07.2022] 08:54:47 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 15
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 228
+#Computed reasons (base/core): 1/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:54:57 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 22 =====
+Solving time(ms): 9726
+[01.07.2022] 08:54:57 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 39
+Consistency check time(ms): 1
+Base Reason computation time(ms): 4
+Core Reason computation time(ms): 1
+Model size (#events): 251
+#Computed reasons (base/core): 50/48
+#Computed reduced reasons (base/core): 48/20
+
+[01.07.2022] 08:54:58 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 23 =====
+Solving time(ms): 962
+[01.07.2022] 08:54:58 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 29
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 258
+#Computed reasons (base/core): 3/3
+#Computed reduced reasons (base/core): 3/3
+
+[01.07.2022] 08:54:58 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 24 =====
+Solving time(ms): 119
+[01.07.2022] 08:54:58 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 28
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 258
+#Computed reasons (base/core): 3/3
+#Computed reduced reasons (base/core): 3/3
+
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 25 =====
+Solving time(ms): 5841
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 36
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 271
+#Computed reasons (base/core): 2/2
+#Computed reduced reasons (base/core): 2/2
+
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 26 =====
+Solving time(ms): 116
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 36
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 272
+#Computed reasons (base/core): 2/2
+#Computed reduced reasons (base/core): 2/2
+
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 27 =====
+Solving time(ms): 122
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 36
+Consistency check time(ms): 0
+Base Reason computation time(ms): 1
+Core Reason computation time(ms): 0
+Model size (#events): 272
+#Computed reasons (base/core): 2/2
+#Computed reduced reasons (base/core): 2/2
+
+[01.07.2022] 08:55:04 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 28 =====
+Solving time(ms): 115
+[01.07.2022] 08:55:05 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 6
+Population time(ms): 42
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 271
+#Computed reasons (base/core): 2/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:55:08 [DEBUG] RefinementSolver.run - Solver iteration: 
+ ===== Iteration: 29 =====
+Solving time(ms): 3441
+[01.07.2022] 08:55:08 [DEBUG] RefinementSolver.run - Refinement iteration:
+Model extraction time(ms): 5
+Population time(ms): 31
+Consistency check time(ms): 0
+Base Reason computation time(ms): 0
+Core Reason computation time(ms): 0
+Model size (#events): 265
+#Computed reasons (base/core): 2/1
+#Computed reduced reasons (base/core): 1/1
+
+[01.07.2022] 08:55:17 [DEBUG] RefinementSolver.run - Final solver iteration:
+ ===== Final Iteration: 30 =====
+Native Solving/Proof time(ms): 9356
+[01.07.2022] 08:55:17 [INFO] RefinementSolver.run - Bounded specification proven.
+[01.07.2022] 08:55:17 [INFO] PropertyEncoder.encodeBoundEventExec - Encoding bound events execution
+[01.07.2022] 08:55:23 [INFO] RefinementSolver.run - Summary
+ ======== Summary ========
+Number of iterations: 30
+Total native solving time(ms): 107561
+   -- Bound check time(ms): 5541
+Total CAAT solving time(ms): 2078
+   -- Model extraction time(ms): 188
+   -- Population time(ms): 965
+   -- Consistency check time(ms): 9
+   -- Reason computation time(ms): 78
+   -- Refining time(ms): 394
+   -- #Computed core reasons: 248
+   -- #Computed core reduced reasons: 174
+   -- Min model size (#events): 174
+   -- Average model size (#events): 241
+   -- Max model size (#events): 272
+
+[01.07.2022] 08:55:23 [DEBUG] RefinementSolver.run - 
+ ===== SMT Statistics (after final iteration) ===== 
+	conflicts -> 16090
+	decisions -> 6909900
+	propagations -> 48528101
+	binary propagations -> 34002532
+	restarts -> 135
+	final checks -> 447
+	added eqs -> 7503000
+	mk clause -> 1347248
+	del clause -> 1293385
+	interface eqs -> 417
+	minimized lits -> 731982
+	num checks -> 32
+	mk bool var -> 2785299
+	arith eq adapter -> 554
+	arith-lower -> 373803
+	arith-upper -> 363468
+	arith-fixed-eqs -> 694
+	arith-conflicts -> 408
+	arith-bound-propagations-lp -> 25724
+	arith-diseq -> 10727
+	arith-assume-eqs -> 417
+	arith-make-feasible -> 45589
+	arith-max-columns -> 2584
+	arith-max-rows -> 2270
+	arith-offset-eqs -> 871
+	bv diseqs -> 82
+	bv dynamic diseqs -> 52659
+	bv bit2core -> 71148982
+	bv->core eq -> 939446
+	bv dynamic eqs -> 3546
+	num allocs -> 173865464
+	rlimit count -> 288645613
+	max memory -> 226.01
+	memory -> 223.78
+	time -> 5.525
+
+[01.07.2022] 08:55:23 [INFO] RefinementSolver.run - Verification finished with result UNKNOWN
+UNKNOWN
