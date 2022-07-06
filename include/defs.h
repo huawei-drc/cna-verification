@@ -40,6 +40,8 @@
 #define __setup(A,B)
 
 /* needed to run dartagnan using macOS */
+#ifndef __always_inline
 #define __always_inline inline
+#endif
 
 #endif
