@@ -3,7 +3,7 @@ set -e
 
 if [ "${DOCKER}" ]; then
         OPTS="-it --rm -v $(pwd):$(pwd) -u $(id -u):$(id -g) -w $(pwd)"
-        exec docker run ${OPTS} dartagnan $0 $@
+        exec docker run ${OPTS} cna-dartagnan $0 $@
 fi
 
 function usage()
@@ -42,6 +42,14 @@ while [[ $# -gt 0 ]]; do
                                         ;;
                         esac
                         ;;            
+                -s|--solver)
+                        method="$2"
+                        shift
+                        ;;
+                -p|--properties)
+                        properties="$2"
+                        shift
+                        ;;
                 -D*)
                         defines="${defines} $1"
                         shift # past argument
@@ -74,6 +82,9 @@ CFLAGS="${CFLAGS} -Iinclude"
 export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
 
+[ -z "$properties" ] && properties=reachability,liveness
+[ -z "$method"] && method=caat
+
 exec java -jar \
         $DAT3M_HOME/dartagnan/target/dartagnan-3.0.0.jar \
         $DAT3M_HOME/cat/${catfile} \
@@ -81,6 +92,7 @@ exec java -jar \
         --bound=1 \
         --program.processing.constantPropagation=false \
         --refinement.baseline=no_oota,uniproc,atomic_rmw \
-        --property=reachability,liveness \
+        --property=${properties} \
+        --method=${method} \
         --witness.graphzviz=true \
         $@
