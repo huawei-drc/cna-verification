@@ -14,7 +14,8 @@ It requires an Internet connection to get the different source and patch files
 and the following to be installed:
 - make
 - curl
-- GenMC v0.6.1
+- Dartagnan
+- GenMC v0.8
 
 ## Verifying CNA with GenMC installed on the host
 
@@ -55,12 +56,12 @@ the repository and the CNA patch is applied on top of these sources.
 Then, in the same directory, build the Docker image by executing the following
 on the host:
 
-    docker build -t genmc-cna .
+    docker build -t cna-verification .
 
 You can run the rest of the steps (GenMC verification) in a new Docker container
 by mounting the git repository in it:
 
-    docker run -it --rm -v $(pwd):/workspace -u $(id -u):$(id -g) -w /workspace genmc-cna make
+    docker run -it --rm -v $(pwd):/workspace -u $(id -u):$(id -g) -w /workspace cna-verification make
 
 This last command will run GenMC to verify the different locks (as described in
 the previous section).

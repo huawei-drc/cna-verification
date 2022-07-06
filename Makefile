@@ -7,11 +7,21 @@ default: prepared
 
 help:
 	@echo "Goals:"
+	@echo " build-docker    build dartagnan and genmc docker images"
 	@echo "	linux_files     download Linux qspinlock (Linux 5.14)"
 	@echo "	cna_patch       apply CNA patch"
 	@echo "	verif_patch     apply verification patch"
 	@echo "	empty_headers   create supporting empty headers"
 	@echo "	prepared    	apply all patches and be ready for verification"
+
+###############################################################################
+# Step 0: build docker images
+###############################################################################
+.PHONY: docker-build
+docker-build:
+	scripts/build.sh -f dartagnan.docker -t cna-dartagnan .
+	scripts/build.sh -f genmc.docker -t cna-genmc .
+
 
 ###############################################################################
 # Step 1: get qspinlock files from kernel
