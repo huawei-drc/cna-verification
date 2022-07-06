@@ -26,7 +26,6 @@
 /* Supported algorithms */
 #define QSPINLOCK_CNA 1
 #define QSPINLOCK_MCS 2
-#define MCS_SPINLOCK  3
 #ifndef ALGORITHM
 #define ALGORITHM     QSPINLOCK_CNA
 #endif
@@ -115,13 +114,8 @@ static bool cna_threshold_reached = false;
 	#define acquire() queued_spin_lock(&lock)
 #endif /* SKIP_PENDING */
 	#define release() queued_spin_unlock(&lock)
-#else /* ALGORITHM == MCS_SPINLOCK */
-	struct mcs_spinlock *lock;
-	struct mcs_spinlock nodes[NTHREADS];
-	#define init()
-	#define nondet()
-	#define acquire() mcs_spin_lock(&lock, get_node(tid))
-	#define release() mcs_spin_unlock(&lock, get_node(tid))
+#else
+	#error "Invalid algorithm"
 #endif
 static void *get_node(int cpu) { return &nodes[cpu]; }
 
