@@ -41,7 +41,7 @@ export DOCKER=1
 
 # 05 verifying qspinlock on Armv8, without fix, expect no violation found and result UNKNOWN TODO [duration ~XX minutes]
 ./scripts/dartagnan.sh \
-    -m arm \
+    -m armv8 \
     -p reachability,liveness \
     -DALGORITHM=${QSPINLOCK_ALGORITHM} \
     -DSKIP_PENDING \
@@ -74,7 +74,7 @@ export DOCKER=1
 
 # 09 verifying CNA on Armv8, without fix, expect no violation found and result UNKNOWN TODO [duration ~XX minutes]
 ./scripts/dartagnan.sh \
-    -m arm \
+    -m armv8 \
     -p reachability,liveness \
     -DALGORITHM=${CNA_ALGORITHM} \
     -DSKIP_PENDING \
