@@ -72,4 +72,3 @@ Notice that after applying the CNA patch files to the original Linux source
 files, we apply our own patch `verification.patch`.
 This patch file contains the changes detailed in our
 [technical note](https://arxiv.org/abs/2111.15240).
-We marked our changes in the source code with "NOTE:".
