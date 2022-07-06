@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
         ;;
         lkmm)
         target=lkmm
-        catfile=lkmm.cat      
+        catfile=linux-kernel.cat      
         ;;
         *)
         usage
