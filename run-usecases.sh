@@ -80,7 +80,7 @@ export DOCKER=1
     -DSKIP_PENDING \
     client-code.c | tee results/out09-dartagnan-armv8-cna.txt
 
-# 41 verifying qspinlock on Power, without fix, expect no violation found and result UNKNOWN TODO [duration ~XX minutes]
+# 10 verifying qspinlock on Power, without fix, expect no violation found and result UNKNOWN TODO [duration ~XX minutes]
 ./scripts/dartagnan.sh \
     -m power \
     -p reachability,liveness \
