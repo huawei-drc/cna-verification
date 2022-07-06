@@ -17,8 +17,8 @@ help:
 ###############################################################################
 # Step 0: build docker images
 ###############################################################################
-.PHONY: docker-build
-docker-build:
+.PHONY: docker_build
+docker_build:
 	scripts/build.sh -f dartagnan.docker -t cna-dartagnan .
 	scripts/build.sh -f genmc.docker -t cna-genmc .
 
