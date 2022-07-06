@@ -19,43 +19,42 @@ defines=""
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
-  case $1 in
-    -m|--memory-model)
-      ARCH="$2"
-      shift # past argument
-      shift # past value
-      case "$ARCH" in
-      armv8)
-        target=arm8
-        catfile=aarch64.cat      
-        ;;
-        power)
-        target=power
-        catfile=power.cat      
-        ;;
-        lkmm)
-        target=lkmm
-        catfile=linux-kernel.cat      
-        ;;
-        *)
-        usage
-        ;;
+        case $1 in
+                -m|--memory-model)
+                        ARCH="$2"
+                        shift # past argument
+                        shift # past value
+                        case "$ARCH" in
+                                armv8)
+                                        target=arm8
+                                        catfile=aarch64.cat      
+                                        ;;
+                                power)
+                                        target=power
+                                        catfile=power.cat      
+                                        ;;
+                                lkmm)
+                                        target=lkmm
+                                        catfile=linux-kernel.cat      
+                                        ;;
+                                *)
+                                        usage
+                                        ;;
+                        esac
+                        ;;            
+                -D*)
+                        defines="${defines} $1"
+                        shift # past argument
+                        ;;
+                -*|--*)
+                        echo "Unknown option $1"
+                        exit 1
+                        ;;
+                *)
+                        POSITIONAL_ARGS+=("$1") # save positional arg
+                        shift # past argument
+                        ;;
         esac
-      ;;
-    
-    -D*)
-      defines="${defines} $1"
-      shift # past argument
-      ;;
-    -*|--*)
-      echo "Unknown option $1"
-      exit 1
-      ;;
-    *)
-      POSITIONAL_ARGS+=("$1") # save positional arg
-      shift # past argument
-      ;;
-  esac
 done
 
 set -- "${POSITIONAL_ARGS[@]}"
@@ -82,4 +81,6 @@ exec java -jar \
         --bound=1 \
         --program.processing.constantPropagation=false \
         --refinement.baseline=no_oota,uniproc,atomic_rmw \
-        --property=reachability,liveness $@
+        --property=reachability,liveness \
+        --witness.graphzviz=true \
+        $@

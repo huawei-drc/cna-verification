@@ -47,6 +47,8 @@ RUN if [ "${https_proxy}" ]; then \
 # symlink for clang
 RUN ln -s clang-12 /usr/bin/clang
 
+RUN apt-get update && apt-get install -y graphviz
+
 # Prepare environment ##########################################################
 ENV DAT3M_HOME=/home/Dat3M
 ENV DAT3M_OUTPUT=/workspace/output

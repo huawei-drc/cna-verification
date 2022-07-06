@@ -8,3 +8,4 @@ atomify.diff
 .patch.prepared
 *.ll
 *.diff
+output/
