@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
 OPTS="--network host"
 
-if [ ! -z "${http_proxy}" ]; then
+if [ -n "${http_proxy}" ]; then
         OPTS="${OPTS} --build-arg http_proxy=${http_proxy}"
 fi
-if [ ! -z "${https_proxy}" ]; then
+if [ -n "${https_proxy}" ]; then
         OPTS="${OPTS} --build-arg https_proxy=${https_proxy}"
 fi
 

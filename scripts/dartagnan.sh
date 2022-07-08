@@ -83,7 +83,7 @@ export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
 
 [ -z "$properties" ] && properties=reachability,liveness
-[ -z "$method"] && method=caat
+[ -z "$method" ] && method=caat
 
 exec java -jar \
         $DAT3M_HOME/dartagnan/target/dartagnan-3.0.0.jar \

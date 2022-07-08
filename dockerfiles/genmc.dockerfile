@@ -20,11 +20,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         llvm-8-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy extra certificates ######################################################
-COPY ca-certificates/* /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-RUN git config --global http.sslCAinfo /etc/ssl/certs/ca-certificates.crt
-
 # Build GenMC ##################################################################
 RUN git clone --branch v0.8 --depth 1 https://github.com/MPI-SWS/genmc.git 2> /dev/null
 RUN cd genmc \
