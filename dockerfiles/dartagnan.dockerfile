@@ -1,4 +1,5 @@
 FROM ubuntu:20.04
+
 ENV DEBIAN_FRONTEND=noninteractive
 ENV http_proxy=${http_proxy}
 ENV https_proxy=${https_proxy}
@@ -8,11 +9,6 @@ RUN apt-get update && apt-get install -y \
     git build-essential cmake maven \
     lsb-release sudo wget \
     software-properties-common
-
-# Copy extra certificates ######################################################
-COPY ca-certificates/* /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-RUN git config --global http.sslCAinfo /etc/ssl/certs/ca-certificates.crt
 
 # Install SMACK ################################################################
 RUN cd home && \
