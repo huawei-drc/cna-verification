@@ -3,8 +3,8 @@
 This repository contains the scripts allowing to run the verification of the
 [CNA qspinlock](https://lkml.org/lkml/2021/5/14/821) using two different model
 checkers:
-- the [GenMC model checker](https://plv.mpi-sws.org/genmc/)
-- the [Dartagnan model checker](https://github.com/hernanponcedeleon/Dat3M)
+- [GenMC](https://plv.mpi-sws.org/genmc/)
+- [Dartagnan](https://github.com/hernanponcedeleon/Dat3M)
 
 We use these scripts to produce the results reported in our
 [CNA verification technical note](https://arxiv.org/abs/2111.15240) (available
@@ -55,7 +55,7 @@ reported in [our technical note](https://arxiv.org/abs/2111.15240):
     ./scripts/docker-run-usecases.sh
 
 This last command will run GenMC and Dartagnan to verify the different locks
-(qspinlock, CNA) under the different memory models (LKMM, ARMv8, Power).
+(qspinlock, CNA) under the different memory models (IMM, LKMM, ARMv8, Power).
 The content script is self-explanatory, and can be modified
 according to other possible use cases.
 
