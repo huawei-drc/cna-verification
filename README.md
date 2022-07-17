@@ -67,5 +67,14 @@ to output result files).
 
 Notice that after applying the CNA patch files to the original Linux source
 files, we apply our own patch `verification.patch`.
-This patch file contains the changes detailed in our
-[technical note](https://arxiv.org/abs/2111.15240).
+This patch file contains the changes detailed in  **CNA and qspinlock changes** 
+of our [technical note](https://arxiv.org/abs/2111.15240) regarding .
+
+## The LKMM fixes patch
+
+As described in **Correctness violations in qspinlock** of the 
+[technical report](https://arxiv.org/abs/2111.15240), we found some correctness 
+issues (safety, liveness, and data-races) in qspinlock according to LKMM.
+File `lkmm-fixes.patch` proposes solutions to those problems. Each solution can 
+be enabled using the flag `-DFIXN` where `N` in `{1,2,3,4,5}`. Once all flags are 
+enabled, the code is correct according to LKMM.
