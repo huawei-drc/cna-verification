@@ -58,7 +58,17 @@ export DOCKER=1
     -DSKIP_PENDING \
     client-code.c | tee results/out05-dartagnan-armv8-qspinlock.txt
 
-# 06    Verifying qspinlock on Power using Dartagnan,
+# 06    Verifying qspinlock under RISC-V using Dartagnan,
+#       without applying any fix.
+#       Expect no violation found and result UNKNOWN [duration ~3 minutes].
+./scripts/dartagnan.sh \
+    -m riscv \
+    -p reachability,liveness \
+    -DALGORITHM=${QSPINLOCK_ALGORITHM} \
+    -DSKIP_PENDING \
+    client-code.c | tee results/out06-dartagnan-riscv-qspinlock.txt
+
+# 07    Verifying qspinlock on Power using Dartagnan,
 #       without applying any fix.
 #       Expect no violation found and result UNKNOWN [duration ~3 minutes].
 ./scripts/dartagnan.sh \
@@ -66,9 +76,9 @@ export DOCKER=1
     -p reachability,liveness \
     -DALGORITHM=${QSPINLOCK_ALGORITHM} \
     -DSKIP_PENDING \
-    client-code.c | tee results/out06-dartagnan-power-qspinlock.txt
+    client-code.c | tee results/out07-dartagnan-power-qspinlock.txt
 
-# 07    Verifying CNA under LKMM using Dartagnan,
+# 08    Verifying CNA under LKMM using Dartagnan,
 #       without applying any fix.
 #       Expect to find a liveness violation [duration ~30 minutes].
 ./scripts/dartagnan.sh \
@@ -76,9 +86,9 @@ export DOCKER=1
     -p liveness \
     -DALGORITHM=${CNA_ALGORITHM} \
     -DSKIP_PENDING \
-    client-code.c | tee results/out07-dartagnan-lkmm-cna-livenessviolation.txt
+    client-code.c | tee results/out08-dartagnan-lkmm-cna-livenessviolation.txt
 
-# 08    Verifying CNA under LKMM using Dartagnan,
+# 09    Verifying CNA under LKMM using Dartagnan,
 #       applying fixes 1 and 2.
 #       Expect no violation found and result UNKNOWN [duration ~16 hours].
 ./scripts/dartagnan.sh \
@@ -87,9 +97,9 @@ export DOCKER=1
     -DALGORITHM=${CNA_ALGORITHM} \
     -DSKIP_PENDING \
     -DFIX1 -DFIX2 \
-    client-code.c | tee results/out08-dartagnan-lkmm-cna-fixes.txt
+    client-code.c | tee results/out09-dartagnan-lkmm-cna-fixes.txt
 
-# 09    Verifying CNA on Armv8 using Dartagnan,
+# 10    Verifying CNA on Armv8 using Dartagnan,
 #       without applying any fix.
 #       Expect no violation found and result UNKNOWN [duration ~12 hours].
 ./scripts/dartagnan.sh \
@@ -97,9 +107,19 @@ export DOCKER=1
     -p reachability,liveness \
     -DALGORITHM=${CNA_ALGORITHM} \
     -DSKIP_PENDING \
-    client-code.c | tee results/out09-dartagnan-armv8-cna.txt
+    client-code.c | tee results/out10-dartagnan-armv8-cna.txt
 
-# 10    Verifying qspinlock on Power using Dartagnan,
+# 11    Verifying CNA on RISC-V using Dartagnan,
+#       without applying any fix.
+#       Expect no violation found and result UNKNOWN [duration ~12 hours].
+./scripts/dartagnan.sh \
+    -m riscv \
+    -p reachability,liveness \
+    -DALGORITHM=${CNA_ALGORITHM} \
+    -DSKIP_PENDING \
+    client-code.c | tee results/out11-dartagnan-riscv-cna.txt
+
+# 12    Verifying qspinlock on Power using Dartagnan,
 #       without applying any fix.
 #       Expect no violation found and result UNKNOWN [duration ~12 hours].
 ./scripts/dartagnan.sh \
@@ -107,4 +127,4 @@ export DOCKER=1
     -p reachability,liveness \
     -DALGORITHM=${CNA_ALGORITHM} \
     -DSKIP_PENDING \
-    client-code.c | tee results/out10-dartagnan-power-cna.txt
+    client-code.c | tee results/out12-dartagnan-power-cna.txt

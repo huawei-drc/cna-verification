@@ -33,6 +33,10 @@ while [[ $# -gt 0 ]]; do
                                         target=power
                                         catfile=power.cat      
                                         ;;
+                                riscv)
+                                        target=riscv
+                                        catfile=riscv.cat
+                                        ;;
                                 lkmm)
                                         target=lkmm
                                         catfile=linux-kernel.cat      
@@ -91,7 +95,7 @@ exec java -jar \
         --target=${target} \
         --bound=1 \
         --program.processing.constantPropagation=false \
-        --refinement.baseline=no_oota,uniproc,atomic_rmw \
+        --refinement.baseline=no_oota \
         --property=${properties} \
         --method=${method} \
         --witness.graphzviz=true \
