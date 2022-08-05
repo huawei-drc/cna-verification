@@ -26,7 +26,7 @@ RUN cd home && \
 # Install Dat3M ################################################################
 RUN cd home && \
     git clone --branch cna-verification https://github.com/hernanponcedeleon/Dat3M.git && \
-    cd Dat3M && git checkout a56dd70c493bf28efffe037faaa9b3299363cb65
+    cd Dat3M && git checkout f9e2b2b85055854f80250e3456042c257f82f03c
 
 RUN if [ "${https_proxy}" ]; then \
         export https_host=`echo ${https_proxy} | cut -d: -f 2 | cut -d/ -f3`; \

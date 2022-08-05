@@ -50,6 +50,10 @@ while [[ $# -gt 0 ]]; do
                         method="$2"
                         shift
                         ;;
+                -t|--smt-solver)
+                        smtsolver="$2"
+                        shift
+                        ;;
                 -p|--properties)
                         properties="$2"
                         shift
@@ -88,6 +92,7 @@ export DAT3M_OUTPUT=$(pwd)/output
 
 [ -z "$properties" ] && properties=reachability,liveness
 [ -z "$method" ] && method=caat
+[ -z "$smtsolver" ] && smtsolver=Z3
 
 exec java -jar \
         $DAT3M_HOME/dartagnan/target/dartagnan-3.0.0.jar \
@@ -98,5 +103,6 @@ exec java -jar \
         --refinement.baseline=no_oota \
         --property=${properties} \
         --method=${method} \
+        --solver=${smtsolver} \
         --witness.graphzviz=true \
         $@
