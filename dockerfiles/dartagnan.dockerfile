@@ -19,9 +19,8 @@ RUN cd home && \
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 RUN cd home && \
     cd smack && \
-    sed -i 's/TEST_SMACK=1/TEST_SMACK=0/' bin/build.sh && \
     sed -i 's/sudo /sudo -E /' bin/build.sh && \
-    env TEST_SMACK=0 bin/build.sh
+    env TEST_SMACK=0 INSTALL_Z3=0 INSTALL_CORRAL=0 bin/build.sh
 
 # Install Dat3M ################################################################
 RUN cd home && \
