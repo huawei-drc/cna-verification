@@ -7,7 +7,7 @@ index 6f5d518..577588e 100644
  static __always_inline void clear_pending(struct qspinlock *lock)
  {
 +#ifdef FIX5
-+    atomic_fetch_andnot_release(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
++    atomic_fetch_andnot_release(_Q_PENDING_VAL, &lock->val);
 +#else
  	atomic_andnot(_Q_PENDING_VAL, &lock->val);
 +#endif
