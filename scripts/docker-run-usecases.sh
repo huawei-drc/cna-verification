@@ -60,7 +60,6 @@ do
         -t ${solver} \
         -p reachability \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        -DSKIP_PENDING \
         -DFIX1 -DFIX2 \
         client-code.c | tee results/out05-dartagnan-${solver}-lkmm-qspinlock-safetyviolation2.txt
 
