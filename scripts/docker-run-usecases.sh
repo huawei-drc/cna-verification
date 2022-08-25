@@ -28,7 +28,7 @@ do
         -t ${solver} \
         -p liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out02-dartagnan-${solver}-lkmm-qspinlock-livenessviolation.txt
+        client-code.c | tee results/out02-dartagnan-${solver}-lkmm-qspinlock-liveness-none.txt
 
     # 03    Checking liveness of qspinlock under LKMM using Dartagnan,
     #       applying fix 1.
@@ -39,7 +39,7 @@ do
         -p liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 \
-        client-code.c | tee results/out03-dartagnan-${solver}-lkmm-qspinlock-livenessfixed.txt
+        client-code.c | tee results/out03-dartagnan-${solver}-lkmm-qspinlock-liveness-1.txt
 
     # 04    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fix 1.
@@ -50,7 +50,7 @@ do
         -p reachability \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 \
-        client-code.c | tee results/out04-dartagnan-${solver}-lkmm-qspinlock-safetyviolation1.txt
+        client-code.c | tee results/out04-dartagnan-${solver}-lkmm-qspinlock-safety-1.txt
 
     # 05    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fixes 1 and 2.
@@ -60,9 +60,8 @@ do
         -t ${solver} \
         -p reachability \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        -DSKIP_PENDING \
         -DFIX1 -DFIX2 \
-        client-code.c | tee results/out05-dartagnan-${solver}-lkmm-qspinlock-safetyviolation2.txt
+        client-code.c | tee results/out05-dartagnan-${solver}-lkmm-qspinlock-safety-12.txt
 
     # 06    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fixes 1, 2 and 3.
@@ -73,7 +72,7 @@ do
         -p reachability \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 -DFIX2 -DFIX3 \
-        client-code.c | tee results/out06-dartagnan-${solver}-lkmm-qspinlock-safetyviolation3.txt
+        client-code.c | tee results/out06-dartagnan-${solver}-lkmm-qspinlock-safety-123.txt
 
     # 07    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fixes 1, 2, 3 and 4.
@@ -84,7 +83,7 @@ do
         -p reachability \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 -DFIX2 -DFIX3 -DFIX4 \
-        client-code.c | tee results/out07-dartagnan-${solver}-lkmm-qspinlock-safetyviolation4.txt
+        client-code.c | tee results/out07-dartagnan-${solver}-lkmm-qspinlock-safety-1234.txt
 
     # 08    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fixes 1, 2, 3, 4 and 5.
@@ -95,7 +94,7 @@ do
         -p reachability \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 -DFIX2 -DFIX3 -DFIX4 -DFIX5 \
-        client-code.c | tee results/out08-dartagnan-${solver}-lkmm-qspinlock-safetyfixed.txt
+        client-code.c | tee results/out08-dartagnan-${solver}-lkmm-qspinlock-safety-12345.txt
 
     # 09    Verifying qspinlock under Armv8 using Dartagnan,
     #       without applying any fix.
@@ -105,7 +104,7 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out09-dartagnan-${solver}-armv8-qspinlock.txt
+        client-code.c | tee results/out09-dartagnan-${solver}-armv8-qspinlock-both-none.txt
 
     # 10    Verifying qspinlock under RISC-V using Dartagnan,
     #       without applying any fix.
@@ -115,7 +114,7 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out10-dartagnan-${solver}-riscv-qspinlock.txt
+        client-code.c | tee results/out10-dartagnan-${solver}-riscv-qspinlock-both-none.txt
 
     # 11    Verifying qspinlock on Power using Dartagnan,
     #       without applying any fix.
@@ -125,7 +124,7 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out11-dartagnan-${solver}-power-qspinlock.txt
+        client-code.c | tee results/out11-dartagnan-${solver}-power-qspinlock-both-none.txt
 
     # 12    Checking liveness of CNA under LKMM using Dartagnan,
     #       without applying any fix.
@@ -136,7 +135,7 @@ do
         -p liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
-        client-code.c | tee results/out12-dartagnan-${solver}-lkmm-cna-livenessviolation.txt
+        client-code.c | tee results/out12-dartagnan-${solver}-lkmm-cna-liveness-none.txt
 
     # 13    Checking liveness of CNA under LKMM using Dartagnan,
     #       without applying any fix.
@@ -148,7 +147,7 @@ do
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
         -DFIX1 \
-        client-code.c | tee results/out13-dartagnan-${solver}-lkmm-cna-livenessfixed.txt
+        client-code.c | tee results/out13-dartagnan-${solver}-lkmm-cna-liveness-1.txt
 
     # 14    Checking safety of CNA under LKMM using Dartagnan,
     #       applying fix 1.
@@ -160,7 +159,7 @@ do
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
         -DFIX1 \
-        client-code.c | tee results/out14-dartagnan-${solver}-lkmm-cna-safetyviolation.txt
+        client-code.c | tee results/out14-dartagnan-${solver}-lkmm-cna-safety-1.txt
 
     # 15    Checking safety of CNA under LKMM using Dartagnan,
     #       applying fixes 1 and 2.
@@ -172,7 +171,7 @@ do
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
         -DFIX1 -DFIX2 \
-        client-code.c | tee results/out15-dartagnan-${solver}-lkmm-cna-safetyfixed.txt
+        client-code.c | tee results/out15-dartagnan-${solver}-lkmm-cna-safety-2.txt
 
     # 16    Verifying CNA on Armv8 using Dartagnan,
     #       without applying any fix.
@@ -183,7 +182,7 @@ do
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
-        client-code.c | tee results/out16-dartagnan-${solver}-armv8-cna.txt
+        client-code.c | tee results/out16-dartagnan-${solver}-armv8-cna-both-none.txt
 
     # 17    Verifying CNA on RISC-V using Dartagnan,
     #       without applying any fix.
@@ -194,7 +193,7 @@ do
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
-        client-code.c | tee results/out17-dartagnan-${solver}-riscv-cna.txt
+        client-code.c | tee results/out17-dartagnan-${solver}-riscv-cna-both-none.txt
 
     # 18    Verifying qspinlock on Power using Dartagnan,
     #       without applying any fix.
@@ -205,6 +204,6 @@ do
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
         -DSKIP_PENDING \
-        client-code.c | tee results/out18-dartagnan-${solver}-power-cna.txt
+        client-code.c | tee results/out18-dartagnan-${solver}-power-cna-both-none.txt
 
 done
