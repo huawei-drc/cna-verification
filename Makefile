@@ -26,8 +26,18 @@ docker_build:
 ###############################################################################
 # Step 1: get qspinlock files from kernel
 ###############################################################################
+# alternative: commit-bug
+LINUX_VERSION_TYPE ?= commit-recent
 LINUX_URL     = https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/
-LINUX_VERSION = v5.14
+ifeq ($(LINUX_VERSION_TYPE), commit-recent)
+	LINUX_VERSION = v5.14
+else
+	ifeq ($(LINUX_VERSION_TYPE), commit-old)
+		LINUX_VERSION = 64d816cba06c67eeee455b8c78ebcda349d49c24
+	else
+		$(info "unknown linux version: $(LINUX_VERSION_TYPE)")
+	endif
+endif
 LINUX_FILES = \
 	kernel/locking/lock_events_list.h \
 	kernel/locking/lock_events.h \
@@ -51,10 +61,12 @@ CNA_PATCH_URL = https://lkml.org/lkml/diff/2021/5/14
 CNA_FILE  = kernel/locking/qspinlock_cna.h
 
 $(CNA_FILE): $(LINUX_FILES)
-	for patch_id in 820 818 822 823 817 819; do \
-		curl --create-dirs -o $(CNA_PATCH_DIR)/$$patch_id.diff $(CNA_PATCH_URL)/$$patch_id/1 ; \
-		patch -p1 --force < $(CNA_PATCH_DIR)/$$patch_id.diff ; \
-	done
+	if [ $(LINUX_VERSION_TYPE) = "commit-recent" ]; then \
+		for patch_id in 820 818 822 823 817 819; do \
+			curl --create-dirs -o $(CNA_PATCH_DIR)/$$patch_id.diff $(CNA_PATCH_URL)/$$patch_id/1 ; \
+			patch -p1 --force < $(CNA_PATCH_DIR)/$$patch_id.diff ; \
+		done \
+	fi
 
 .PHONY: cna_patch
 cna_patch: $(CNA_FILE)
@@ -62,7 +74,7 @@ cna_patch: $(CNA_FILE)
 ###############################################################################
 # Step 3: apply verification patch
 ###############################################################################
-VERIF_PATCH = verification.patch
+VERIF_PATCH = verification-$(LINUX_VERSION_TYPE).patch
 VERIF_FILE  = .patch.applied
 
 $(VERIF_FILE): $(VERIF_PATCH) $(CNA_FILE)
@@ -79,7 +91,9 @@ FIXES_PATCH = lkmm-fixes.patch
 FIXES_FILE  = .fixes.applied
 
 $(FIXES_FILE): $(FIXES_PATCH) $(VERIF_FILE)
-	patch -p1 < $(FIXES_PATCH)
+	if [ $(LINUX_VERSION_TYPE) = "commit-recent" ]; then \
+		patch -p1 < $(FIXES_PATCH) ; \
+	fi
 	@touch $@
 
 .PHONY: fixes_patch
