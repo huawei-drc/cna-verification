@@ -79,6 +79,64 @@ File `lkmm-fixes.patch` proposes solutions to those problems. Each solution can
 be enabled using the flag `-DFIXN` where `N` in `{1,2,3,4,5}`. Once all flags are 
 enabled, the code is correct according to LKMM.
 
+## Verification results
+
+Herebelow we show our verification results for different lock algorithms and with different Dartagnan parameters.
+
+| Memory model   | SMT solver   | Lock algorithm            | Properties       | Verif. time   | Verified?   |
+|:---------------|:-------------|:--------------------------|:-----------------|:--------------|:------------|
+| LKMM           | Z3           | qspinlock, unmodified     | Liveness         | 3 min         | X           |
+| LKMM           | mathsat5     | qspinlock, unmodified     | Liveness         | 48 s          | X           |
+| LKMM           | yices2       | qspinlock, unmodified     | Liveness         | 19 s          | X           |
+| LKMM           | Z3           | qspinlock, with fix 1     | Liveness         | 16 min        | V           |
+| LKMM           | mathsat5     | qspinlock, with fix 1     | Liveness         | 3 min         | V           |
+| LKMM           | yices2       | qspinlock, with fix 1     | Liveness         | 53 s          | V           |
+| LKMM           | Z3           | qspinlock, with fix 1     | Safety           | 55 s          | X           |
+| LKMM           | mathsat5     | qspinlock, with fix 1     | Safety           | 20 s          | X           |
+| LKMM           | yices2       | qspinlock, with fix 1     | Safety           | 5 s           | X           |
+| LKMM           | Z3           | qspinlock, with fixes 1-2 | Safety           | 56 s          | X           |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-2 | Safety           | 29 s          | X           |
+| LKMM           | yices2       | qspinlock, with fixes 1-2 | Safety           | 6 s           | X           |
+| LKMM           | Z3           | qspinlock, with fixes 1-3 | Safety           | 7 min         | X           |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-3 | Safety           | 54 s          | X           |
+| LKMM           | yices2       | qspinlock, with fixes 1-3 | Safety           | 7 s           | X           |
+| LKMM           | Z3           | qspinlock, with fixes 1-4 | Safety           | 5 min         | X           |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-4 | Safety           | 39 s          | X           |
+| LKMM           | yices2       | qspinlock, with fixes 1-4 | Safety           | 12 s          | X           |
+| LKMM           | Z3           | qspinlock, with fixes 1-5 | Safety           | 20 min        | V           |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-5 | Safety           | 3 min         | V           |
+| LKMM           | yices2       | qspinlock, with fixes 1-5 | Safety           | 44 s          | V           |
+| ARMv8          | Z3           | qspinlock, unmodified     | Liveness, Safety | 16 min        | V           |
+| ARMv8          | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 4 min         | V           |
+| ARMv8          | yices2       | qspinlock, unmodified     | Liveness, Safety | 2 min         | V           |
+| RISC-V         | Z3           | qspinlock, unmodified     | Liveness, Safety | 18 min        | V           |
+| RISC-V         | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 4 min         | V           |
+| RISC-V         | yices2       | qspinlock, unmodified     | Liveness, Safety | 2 min         | V           |
+| Power          | Z3           | qspinlock, unmodified     | Liveness, Safety | 19 min        | V           |
+| Power          | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 4 min         | V           |
+| Power          | yices2       | qspinlock, unmodified     | Liveness, Safety | 2 min         | V           |
+| LKMM           | Z3           | CNA, unmodified           | Liveness         | 5 min         | X           |
+| LKMM           | mathsat5     | CNA, unmodified           | Liveness         | 9 min         | X           |
+| LKMM           | yices2       | CNA, unmodified           | Liveness         | 11 min        | X           |
+| LKMM           | Z3           | CNA, with fix 1           | Liveness         | 1h 13 min     | V           |
+| LKMM           | mathsat5     | CNA, with fix 1           | Liveness         | 27 min        | V           |
+| LKMM           | yices2       | CNA, with fix 1           | Liveness         | 12 min        | V           |
+| LKMM           | Z3           | CNA, with fix 1           | Safety           | 6 min         | X           |
+| LKMM           | mathsat5     | CNA, with fix 1           | Safety           | 22 min        | X           |
+| LKMM           | yices2       | CNA, with fix 1           | Safety           | 5 min         | X           |
+| LKMM           | Z3           | CNA, with fix 2           | Safety           | 1h 32 min     | V           |
+| LKMM           | mathsat5     | CNA, with fix 2           | Safety           | 33 min        | V           |
+| LKMM           | yices2       | CNA, with fix 2           | Safety           | 8 min         | V           |
+| ARMv8          | Z3           | CNA, unmodified           | Liveness, Safety | 1h 11 min     | V           |
+| ARMv8          | mathsat5     | CNA, unmodified           | Liveness, Safety | 46 min        | V           |
+| ARMv8          | yices2       | CNA, unmodified           | Liveness, Safety | 11 min        | V           |
+| RISC-V         | Z3           | CNA, unmodified           | Liveness, Safety | 52 min        | V           |
+| RISC-V         | mathsat5     | CNA, unmodified           | Liveness, Safety | 36 min        | V           |
+| RISC-V         | yices2       | CNA, unmodified           | Liveness, Safety | 10 min        | V           |
+| Power          | Z3           | CNA, unmodified           | Liveness, Safety | 1h 0 min      | V           |
+| Power          | mathsat5     | CNA, unmodified           | Liveness, Safety | 20 min        | V           |
+| Power          | yices2       | CNA, unmodified           | Liveness, Safety | 18 min        | V           |
+
 ## Verification of an alternative version of qpsinlock
 
 We also allow to verify and old version of qspinlock which contains an actual bug (i.e. reproducible in hardware) introduced by [this commit](https://github.com/torvalds/linux/commit/64d816cba06c67eeee455b8c78ebcda349d49c24).
@@ -87,5 +145,3 @@ This version can be verified following the steps below inside the Dartagnan cont
 - `./scripts/dartagnan.sh -m armv8 -p liveness -DALGORITHM=3 -DCFLAGS="${CFLAGS} -I./include" client-code.c`
 
 **Expected result:** "Liveness violation found"
-
-
