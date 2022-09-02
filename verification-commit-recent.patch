@@ -20,10 +20,10 @@ index d74b138..09a365e 100644
  
 -	queued_spin_lock_slowpath(lock, val);
 +#if defined(CONFIG_NUMA_AWARE_SPINLOCKS)
-+		/* We bypass the call (ignoring the boot argument). */
-+		__cna_queued_spin_lock_slowpath(lock, val);
++	/* We bypass the call (ignoring the boot argument). */
++	__cna_queued_spin_lock_slowpath(lock, val);
 +#else
-+		queued_spin_lock_slowpath(lock, val);
++	queued_spin_lock_slowpath(lock, val);
 +#endif /* defined(CONFIG_NUMA_AWARE_SPINLOCKS) */
  }
  #endif
