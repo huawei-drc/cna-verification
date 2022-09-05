@@ -1,8 +1,34 @@
 diff --git a/include/asm-generic/qspinlock.h b/include/asm-generic/qspinlock.h
-index d74b138..a0bab6f 100644
+index d74b138..09a365e 100644
 --- a/include/asm-generic/qspinlock.h
 +++ b/include/asm-generic/qspinlock.h
-@@ -96,7 +96,11 @@ static __always_inline void queued_spin_unlock(struct qspinlock *lock)
+@@ -68,7 +68,11 @@ static __always_inline int queued_spin_trylock(struct qspinlock *lock)
+ 	return likely(atomic_try_cmpxchg_acquire(&lock->val, &val, _Q_LOCKED_VAL));
+ }
+ 
++#if defined(CONFIG_NUMA_AWARE_SPINLOCKS)
++extern void __cna_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
++#else
+ extern void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
++#endif /* defined(CONFIG_NUMA_AWARE_SPINLOCKS) */
+ 
+ #ifndef queued_spin_lock
+ /**
+@@ -82,7 +86,12 @@ static __always_inline void queued_spin_lock(struct qspinlock *lock)
+ 	if (likely(atomic_try_cmpxchg_acquire(&lock->val, &val, _Q_LOCKED_VAL)))
+ 		return;
+ 
+-	queued_spin_lock_slowpath(lock, val);
++#if defined(CONFIG_NUMA_AWARE_SPINLOCKS)
++	/* We bypass the call (ignoring the boot argument). */
++	__cna_queued_spin_lock_slowpath(lock, val);
++#else
++	queued_spin_lock_slowpath(lock, val);
++#endif /* defined(CONFIG_NUMA_AWARE_SPINLOCKS) */
+ }
+ #endif
+ 
+@@ -96,7 +105,11 @@ static __always_inline void queued_spin_unlock(struct qspinlock *lock)
  	/*
  	 * unlock() needs release semantics:
  	 */
