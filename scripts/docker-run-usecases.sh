@@ -11,7 +11,7 @@ solvers="yices2 mathsat5 Z3"
 
 make docker_build
 
-mkdir results
+mkdir -p results
 export DOCKER=1
 
 # 01    Verifying cna (original version) under IMM using GenMC.
