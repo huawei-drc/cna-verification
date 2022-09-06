@@ -103,7 +103,7 @@ static void* run(void *arg)
 
 int main()
 {
-	pthread_t t0, t1, t2, t3, t4, t5;
+	pthread_t t0, t1, t2, t3;
 
 	init();
 
