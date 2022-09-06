@@ -1,5 +1,5 @@
 diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
-index 6f5d518..577588e 100644
+index 70bd251..e917e27 100644
 --- a/kernel/locking/qspinlock.c
 +++ b/kernel/locking/qspinlock.c
 @@ -198,7 +198,11 @@ static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
@@ -40,7 +40,7 @@ index 6f5d518..577588e 100644
  		if (old == val)
  			break;
  
-@@ -388,7 +400,12 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+@@ -386,7 +398,12 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
  	 *
  	 * 0,0,* -> 0,1,* -> 0,0,1 pending, trylock
  	 */
@@ -54,7 +54,7 @@ index 6f5d518..577588e 100644
  
  	/*
  	 * If we observe contention, there is a concurrent locker.
-@@ -470,8 +487,8 @@ pv_queue:
+@@ -468,8 +485,8 @@ pv_queue:
  	 */
  	barrier();
  
@@ -65,7 +65,7 @@ index 6f5d518..577588e 100644
  	pv_init_node(node);
  
  	/*
-@@ -489,7 +506,11 @@ pv_queue:
+@@ -485,7 +502,11 @@ pv_queue:
  	 * publish the updated tail via xchg_tail() and potentially link
  	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
  	 */

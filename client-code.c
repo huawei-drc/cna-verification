@@ -13,16 +13,6 @@
 #define NTHREADS 4
 #endif
 
-/* Number of threads that reacquire the lock (once) */
-#ifndef REACQUIRE
-#define REACQUIRE 0
-#endif
-
-/* Number of reacquires for each thread that does reacquires */ 
-#ifndef REPEAT
-#define REPEAT 1
-#endif
-
 /* Supported algorithms */
 #define QSPINLOCK_CNA 1
 #define QSPINLOCK_MCS 2
@@ -33,16 +23,8 @@
 #define ALGORITHM     QSPINLOCK_CNA
 #endif
 
-/* skip fast path and pending logic, jump directly to queue */
-//#define SKIP_PENDING
-
-/* GenMC can check liveness only if it knows the loops that depend on updates
- * from other threads (spinloops). Its automated spinloop detection does not
- * always work, in particular with these files. So we manually annotate the
- * spinloops. The annotation can be disabled by commenting the next line.
- * If SPIN_ANNOTATION is defined, please pass -disable-spin-assume to GenMC.
- */ 
-#define SPIN_ANNOTATION
+// This allows Dartagnan to fully unroll certain loops despite of the bound used for verification.
+void __VERIFIER_loop_bound(int);
 
 /*******************************************************************************
  * Includes, context, lock selection -- NO USER OPTIONS FROM HERE ON.
@@ -54,21 +36,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-/* await_while annotation */
-#ifdef SPIN_ANNOTATION
-  void __VERIFIER_loop_begin(void);
-  void __VERIFIER_spin_start(void);
-  void __VERIFIER_spin_end(bool);
-  void __VERIFIER_loop_bound(int);
-  #define await_while(cond) for (__VERIFIER_loop_begin();			\
-	__VERIFIER_spin_start(), (cond) ? 1 : (__VERIFIER_spin_end(1), 0);	\
-	__VERIFIER_spin_end(0))
-#else
-  #define await_while(cond) while(cond)
-#endif
-
 /* includes distributed in this repository */
-#include <linux/atomic.h> /* a mapping of linux atomic to GenMC functions */
+#include <linux/atomic.h> /* some linux atomic macros */
 #include <defs.h>         /* replacement of several Linux macros */
 
 /* smp_processor_id */
@@ -101,12 +70,6 @@ static bool cna_threshold_reached = false;
 	struct cna_node nodes[NTHREADS];
 	#define init()    cna_init_nodes();
 	#define nondet()  WRITE_ONCE(cna_threshold_reached, true);
-#ifdef SKIP_PENDING
-	#define acquire() queued_spin_lock_slowpath(&lock, 0)
-#else
-	#define acquire() queued_spin_lock(&lock)
-#endif /* SKIP_PENDING */
-	#define release() queued_spin_unlock(&lock)
 #elif ALGORITHM == QSPINLOCK_MCS || ALGORITHM == QSPINLOCK_MCS_OLD
 	struct qspinlock lock;
 #if ALGORITHM == QSPINLOCK_MCS
@@ -116,15 +79,10 @@ static bool cna_threshold_reached = false;
 #endif
 	#define init()
 	#define nondet()
-#ifdef SKIP_PENDING
-	#define acquire() queued_spin_lock_slowpath(&lock, 0)
-#else
-	#define acquire() queued_spin_lock(&lock)
-#endif /* SKIP_PENDING */
-	#define release() queued_spin_unlock(&lock)
 #else
 	#error "Invalid algorithm"
 #endif
+
 static void *get_node(int cpu) { return &nodes[cpu]; }
 
 /*******************************************************************************
@@ -135,17 +93,17 @@ static void* run(void *arg)
 {
 	tid = (intptr_t)arg;
 
-	acquire();
+	queued_spin_lock(&lock);
 	x = x + 1;
 	y = y + 1;
-	release();
+	queued_spin_unlock(&lock);
 
 	return NULL;
 }
 
 int main()
 {
-	pthread_t t0, t1, t2, t3;
+	pthread_t t0, t1, t2, t3, t4, t5;
 
 	init();
 

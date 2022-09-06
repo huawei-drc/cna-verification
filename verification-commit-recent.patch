@@ -40,21 +40,8 @@ index d74b138..09a365e 100644
  }
  #endif
  
-diff --git a/kernel/locking/mcs_spinlock.h b/kernel/locking/mcs_spinlock.h
-index 3926aad..82afef1 100644
---- a/kernel/locking/mcs_spinlock.h
-+++ b/kernel/locking/mcs_spinlock.h
-@@ -110,7 +110,7 @@ void mcs_spin_unlock(struct mcs_spinlock **lock, struct mcs_spinlock *node)
- 		if (likely(cmpxchg_release(lock, node, NULL) == node))
- 			return;
- 		/* Wait until the next pointer is set */
--		while (!(next = READ_ONCE(node->next)))
-+		await_while(!(next = READ_ONCE(node->next)))
- 			cpu_relax();
- 	}
- 
 diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
-index 8c1a21b..6f5d518 100644
+index 8c1a21b..70bd251 100644
 --- a/kernel/locking/qspinlock.c
 +++ b/kernel/locking/qspinlock.c
 @@ -66,7 +66,9 @@
@@ -89,28 +76,6 @@ index 8c1a21b..6f5d518 100644
  }
  
  
-@@ -348,7 +354,9 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
- 	struct mcs_spinlock *prev, *next, *node;
- 	u32 old, tail;
- 	int idx;
--
-+#ifdef SKIP_PENDING
-+	goto queue;
-+#endif
- 	BUILD_BUG_ON(CONFIG_NR_CPUS >= (1U << _Q_TAIL_CPU_BITS));
- 
- 	if (pv_enabled())
-@@ -471,8 +479,10 @@ pv_queue:
- 	 * attempt the trylock once more in the hope someone let go while we
- 	 * weren't watching.
- 	 */
-+#if !defined(SKIP_PENDING)
- 	if (queued_spin_trylock(lock))
- 		goto release;
-+#endif
- 
- 	/*
- 	 * Ensure that the initialisation of @node is complete before we
 diff --git a/kernel/locking/qspinlock_cna.h b/kernel/locking/qspinlock_cna.h
 index 17d56c7..c828781 100644
 --- a/kernel/locking/qspinlock_cna.h
