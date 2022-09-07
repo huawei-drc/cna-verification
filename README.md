@@ -129,7 +129,7 @@ Herebelow we show our verification results for different lock algorithms and wit
 | Power          | yices2       | CNA, unmodified           | Liveness, Safety | 4 min         | :heavy_check_mark: |
 ## Verification of an alternative version of qpsinlock
 
-We also allow to verify and old version of qspinlock which contains an actual bug (i.e. reproducible in hardware) introduced by [this commit](https://github.com/torvalds/linux/commit/64d816cba06c67eeee455b8c78ebcda349d49c24).
+We also allow to verify an old version of qspinlock which contains an actual bug (i.e. reproducible in hardware) introduced by [this commit](https://github.com/torvalds/linux/commit/64d816cba06c67eeee455b8c78ebcda349d49c24).
 This version can be verified following the steps below inside the Dartagnan container
 - `make prepared LINUX_VERSION_TYPE=commit-old`
 - `./scripts/dartagnan.sh -m armv8 -p liveness -DALGORITHM=3 -DCFLAGS="${CFLAGS} -I./include" client-code.c`
