@@ -20,7 +20,7 @@ index 70bd251..8878a33 100644
  static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
  {
 -	atomic_add(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
-+#ifdef FIX3
++#ifdef FIX2
 +    atomic_fetch_add_release(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
 +#else
 +    atomic_add(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
@@ -46,7 +46,7 @@ index 70bd251..8878a33 100644
  	 * 0,0,* -> 0,1,* -> 0,0,1 pending, trylock
  	 */
 -	val = queued_fetch_set_pending_acquire(lock);
-+#ifdef FIX2
++#ifdef FIX3
 +    val = atomic_fetch_or_release(_Q_PENDING_VAL, &lock->val);
 +    smp_mb();
 +#else
