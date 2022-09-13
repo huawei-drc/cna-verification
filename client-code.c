@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 /*******************************************************************************
- * Run this client code with GenMC 0.7 to verify the correctness of the
+ * Run this client code with Dartagnan to verify the correctness of the
  * CNA slowpath of qspinlock (qspinlock_cna.h) from Linux 5.14.
  * The client code can be alternatively configured to use the MCS slowpath or
- * just the plain MCS lock (mcs_spinlock.h).
+ * an old version containing a liveness bug which is reproducible in hardware.
  ******************************************************************************/
 
 /* Number of threads */
