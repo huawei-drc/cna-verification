@@ -101,7 +101,9 @@ exec java -jar \
         --bound=1 \
         --program.processing.constantPropagation=false \
         --refinement.baseline=no_oota \
+        --encoding.symmetry.breakOnRelation=rf \
         --encoding.wmm.idl2sat=true \
+        --modeling.threadCreateAlwaysSucceeds=true \
         --property=${properties} \
         --method=${method} \
         --solver=${smtsolver} \

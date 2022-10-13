@@ -1,15 +1,16 @@
 diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
-index 70bd251..e917e27 100644
+index 70bd251..8878a33 100644
 --- a/kernel/locking/qspinlock.c
 +++ b/kernel/locking/qspinlock.c
 @@ -198,7 +198,11 @@ static __always_inline u32 xchg_tail(struct qspinlock *lock, u32 tail)
   */
  static __always_inline void clear_pending(struct qspinlock *lock)
  {
-+#ifdef FIX5
+-	atomic_andnot(_Q_PENDING_VAL, &lock->val);
++#ifdef FIX4
 +    atomic_fetch_andnot_release(_Q_PENDING_VAL, &lock->val);
 +#else
- 	atomic_andnot(_Q_PENDING_VAL, &lock->val);
++ 	atomic_andnot(_Q_PENDING_VAL, &lock->val);
 +#endif
  }
  
@@ -19,7 +20,7 @@ index 70bd251..e917e27 100644
  static __always_inline void clear_pending_set_locked(struct qspinlock *lock)
  {
 -	atomic_add(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
-+#ifdef FIX4
++#ifdef FIX2
 +    atomic_fetch_add_release(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
 +#else
 +    atomic_add(-_Q_PENDING_VAL + _Q_LOCKED_VAL, &lock->val);
@@ -32,7 +33,7 @@ index 70bd251..e917e27 100644
  		 * tail.
  		 */
 -		old = atomic_cmpxchg_relaxed(&lock->val, val, new);
-+#ifdef FIX2
++#ifdef FIX1
 +		old = atomic_cmpxchg_release(&lock->val, val, new);
 +#else
 +        old = atomic_cmpxchg_relaxed(&lock->val, val, new);
@@ -54,27 +55,3 @@ index 70bd251..e917e27 100644
  
  	/*
  	 * If we observe contention, there is a concurrent locker.
-@@ -468,8 +485,8 @@ pv_queue:
- 	 */
- 	barrier();
- 
--	node->locked = 0;
--	node->next = NULL;
-+    WRITE_ONCE(node->locked, 0);
-+    WRITE_ONCE(node->next, NULL);
- 	pv_init_node(node);
- 
- 	/*
-@@ -485,7 +502,11 @@ pv_queue:
- 	 * publish the updated tail via xchg_tail() and potentially link
- 	 * @node into the waitqueue via WRITE_ONCE(prev->next, node) below.
- 	 */
--	smp_wmb();
-+#ifdef FIX1
-+	smp_mb();
-+#else
-+    smp_wmb();
-+#endif
- 
- 	/*
- 	 * Publish the updated tail.

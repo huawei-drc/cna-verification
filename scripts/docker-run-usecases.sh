@@ -7,7 +7,7 @@ set -ex
 CNA_ALGORITHM=1
 QSPINLOCK_ALGORITHM=2
 
-solvers="yices2 mathsat5 Z3"
+solvers="yices2 mathsat5 z3"
 
 make docker_build
 
@@ -32,7 +32,7 @@ do
 
     # 03    Checking liveness of qspinlock under LKMM using Dartagnan,
     #       applying fix 1.
-    #       Expect no violation found and result UNKNOWN.
+    #       Expect to find a violation.
     ./scripts/dartagnan.sh \
         -m lkmm \
         -t ${solver} \
@@ -41,16 +41,16 @@ do
         -DFIX1 \
         client-code.c | tee results/out03-dartagnan-${solver}-lkmm-qspinlock-liveness-1.txt
 
-    # 04    Checking safety of qspinlock under LKMM using Dartagnan,
-    #       applying fix 1.
-    #       Expect to find a violation.
+    # 04    Checking liveness of qspinlock under LKMM using Dartagnan,
+    #       applying fix 1 and 2.
+    #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
         -m lkmm \
         -t ${solver} \
-        -p reachability \
+        -p liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        -DFIX1 \
-        client-code.c | tee results/out04-dartagnan-${solver}-lkmm-qspinlock-safety-1.txt
+        -DFIX1 -DFIX2 \
+        client-code.c | tee results/out04-dartagnan-${solver}-lkmm-qspinlock-liveness-12.txt
 
     # 05    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fixes 1 and 2.
@@ -76,7 +76,7 @@ do
 
     # 07    Checking safety of qspinlock under LKMM using Dartagnan,
     #       applying fixes 1, 2, 3 and 4.
-    #       Expect to find a violation.
+    #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
         -m lkmm \
         -t ${solver} \
@@ -85,18 +85,7 @@ do
         -DFIX1 -DFIX2 -DFIX3 -DFIX4 \
         client-code.c | tee results/out07-dartagnan-${solver}-lkmm-qspinlock-safety-1234.txt
 
-    # 08    Checking safety of qspinlock under LKMM using Dartagnan,
-    #       applying fixes 1, 2, 3, 4 and 5.
-    #       Expect no violation found and result UNKNOWN.
-    ./scripts/dartagnan.sh \
-        -m lkmm \
-        -t ${solver} \
-        -p reachability \
-        -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        -DFIX1 -DFIX2 -DFIX3 -DFIX4 -DFIX5 \
-        client-code.c | tee results/out08-dartagnan-${solver}-lkmm-qspinlock-safety-12345.txt
-
-    # 09    Verifying qspinlock under Armv8 using Dartagnan,
+    # 08    Verifying qspinlock under Armv8 using Dartagnan,
     #       without applying any fix.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -104,9 +93,9 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out09-dartagnan-${solver}-armv8-qspinlock-both-none.txt
+        client-code.c | tee results/out08-dartagnan-${solver}-armv8-qspinlock-both-none.txt
 
-    # 10    Verifying qspinlock under RISC-V using Dartagnan,
+    # 09    Verifying qspinlock under RISC-V using Dartagnan,
     #       without applying any fix.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -114,9 +103,9 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out10-dartagnan-${solver}-riscv-qspinlock-both-none.txt
+        client-code.c | tee results/out09-dartagnan-${solver}-riscv-qspinlock-both-none.txt
 
-    # 11    Verifying qspinlock on Power using Dartagnan,
+    # 10    Verifying qspinlock on Power using Dartagnan,
     #       without applying any fix.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -124,9 +113,9 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out11-dartagnan-${solver}-power-qspinlock-both-none.txt
+        client-code.c | tee results/out10-dartagnan-${solver}-power-qspinlock-both-none.txt
 
-    # 12    Verifying CNA under LKMM using Dartagnan,
+    # 11    Verifying CNA under LKMM using Dartagnan,
     #       applying fixes 1, 2, 3, 4 and 5.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -135,9 +124,9 @@ do
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
         -DFIX1 -DFIX2 -DFIX3 -DFIX4 -DFIX5 \
-        client-code.c | tee results/out12-dartagnan-${solver}-lkmm-cna-both-12345.txt
+        client-code.c | tee results/out11-dartagnan-${solver}-lkmm-cna-both-12345.txt
 
-    # 13    Verifying CNA on Armv8 using Dartagnan,
+    # 12    Verifying CNA on Armv8 using Dartagnan,
     #       without applying any fix.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -145,9 +134,9 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
-        client-code.c | tee results/out13-dartagnan-${solver}-armv8-cna-both-none.txt
+        client-code.c | tee results/out12-dartagnan-${solver}-armv8-cna-both-none.txt
 
-    # 14    Verifying CNA on RISC-V using Dartagnan,
+    # 13    Verifying CNA on RISC-V using Dartagnan,
     #       without applying any fix.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -155,9 +144,9 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
-        client-code.c | tee results/out14-dartagnan-${solver}-riscv-cna-both-none.txt
+        client-code.c | tee results/out13-dartagnan-${solver}-riscv-cna-both-none.txt
 
-    # 15    Verifying qspinlock on Power using Dartagnan,
+    # 14    Verifying qspinlock on Power using Dartagnan,
     #       without applying any fix.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
@@ -165,6 +154,6 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
-        client-code.c | tee results/out15-dartagnan-${solver}-power-cna-both-none.txt
+        client-code.c | tee results/out14-dartagnan-${solver}-power-cna-both-none.txt
 
 done
