@@ -85,48 +85,46 @@ Herebelow we show our verification results for different lock algorithms and wit
 
 | Memory model   | SMT solver   | Lock algorithm            | Properties       | Verif. time   | Verified?          |
 |:---------------|:-------------|:--------------------------|:-----------------|:--------------|:-------------------|
-| LKMM           | Z3           | qspinlock, unmodified     | Liveness         | 2 min         | :x:                |
-| LKMM           | mathsat5     | qspinlock, unmodified     | Liveness         | 50 s          | :x:                |
+| LKMM           | mathsat5     | qspinlock, unmodified     | Liveness         | 2 min         | :x:                |
 | LKMM           | yices2       | qspinlock, unmodified     | Liveness         | 18 s          | :x:                |
-| LKMM           | Z3           | qspinlock, with fix 1     | Liveness         | 13 min        | :heavy_check_mark: |
-| LKMM           | mathsat5     | qspinlock, with fix 1     | Liveness         | 3 min         | :heavy_check_mark: |
-| LKMM           | yices2       | qspinlock, with fix 1     | Liveness         | 51 s          | :heavy_check_mark: |
-| LKMM           | Z3           | qspinlock, with fix 1     | Safety           | 20 s          | :x:                |
-| LKMM           | mathsat5     | qspinlock, with fix 1     | Safety           | 20 s          | :x:                |
-| LKMM           | yices2       | qspinlock, with fix 1     | Safety           | 5 s           | :x:                |
-| LKMM           | Z3           | qspinlock, with fixes 1-2 | Safety           | 3 min         | :x:                |
-| LKMM           | mathsat5     | qspinlock, with fixes 1-2 | Safety           | 30 s          | :x:                |
-| LKMM           | yices2       | qspinlock, with fixes 1-2 | Safety           | 6 s           | :x:                |
-| LKMM           | Z3           | qspinlock, with fixes 1-3 | Safety           | 8 min         | :x:                |
-| LKMM           | mathsat5     | qspinlock, with fixes 1-3 | Safety           | 55 s          | :x:                |
-| LKMM           | yices2       | qspinlock, with fixes 1-3 | Safety           | 6 s           | :x:                |
-| LKMM           | Z3           | qspinlock, with fixes 1-4 | Safety           | 3 min         | :x:                |
-| LKMM           | mathsat5     | qspinlock, with fixes 1-4 | Safety           | 37 s          | :x:                |
-| LKMM           | yices2       | qspinlock, with fixes 1-4 | Safety           | 12 s          | :x:                |
-| LKMM           | Z3           | qspinlock, with fixes 1-5 | Safety           | 20 min        | :heavy_check_mark: |
-| LKMM           | mathsat5     | qspinlock, with fixes 1-5 | Safety           | 3 min         | :heavy_check_mark: |
-| LKMM           | yices2       | qspinlock, with fixes 1-5 | Safety           | 46 s          | :heavy_check_mark: |
-| ARMv8          | Z3           | qspinlock, unmodified     | Liveness, Safety | 20 min        | :heavy_check_mark: |
-| ARMv8          | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 4 min         | :heavy_check_mark: |
+| LKMM           | z3           | qspinlock, unmodified     | Liveness         | 4 min         | :x:                |
+| LKMM           | mathsat5     | qspinlock, with fix 1     | Liveness         | 2 min         | :x:                |
+| LKMM           | yices2       | qspinlock, with fix 1     | Liveness         | 14 s          | :x:                |
+| LKMM           | z3           | qspinlock, with fix 1     | Liveness         | 4 min         | :x:                |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-2 | Liveness         | 4 min         | :heavy_check_mark: |
+| LKMM           | yices2       | qspinlock, with fixes 1-2 | Liveness         | 2 min         | :heavy_check_mark: |
+| LKMM           | z3           | qspinlock, with fixes 1-2 | Liveness         | 17 min        | :heavy_check_mark: |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-2 | Safety           | 25 s          | :x:                |
+| LKMM           | yices2       | qspinlock, with fixes 1-2 | Safety           | 11 s          | :x:                |
+| LKMM           | z3           | qspinlock, with fixes 1-2 | Safety           | 2 min         | :x:                |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-3 | Safety           | 2 min         | :x:                |
+| LKMM           | yices2       | qspinlock, with fixes 1-3 | Safety           | 25 s          | :x:                |
+| LKMM           | z3           | qspinlock, with fixes 1-3 | Safety           | 11 min        | :x:                |
+| LKMM           | mathsat5     | qspinlock, with fixes 1-4 | Safety           | 4 min         | :heavy_check_mark: |
+| LKMM           | yices2       | qspinlock, with fixes 1-4 | Safety           | 2 min         | :heavy_check_mark: |
+| LKMM           | z3           | qspinlock, with fixes 1-4 | Safety           | 22 min        | :heavy_check_mark: |
+| ARMv8          | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 5 min         | :heavy_check_mark: |
 | ARMv8          | yices2       | qspinlock, unmodified     | Liveness, Safety | 2 min         | :heavy_check_mark: |
-| RISC-V         | Z3           | qspinlock, unmodified     | Liveness, Safety | 19 min        | :heavy_check_mark: |
-| RISC-V         | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 3 min         | :heavy_check_mark: |
+| ARMv8          | z3           | qspinlock, unmodified     | Liveness, Safety | 16 min        | :heavy_check_mark: |
+| RISC-V         | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 4 min         | :heavy_check_mark: |
 | RISC-V         | yices2       | qspinlock, unmodified     | Liveness, Safety | 2 min         | :heavy_check_mark: |
-| Power          | Z3           | qspinlock, unmodified     | Liveness, Safety | 20 min        | :heavy_check_mark: |
-| Power          | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 4 min         | :heavy_check_mark: |
+| RISC-V         | z3           | qspinlock, unmodified     | Liveness, Safety | 17 min        | :heavy_check_mark: |
+| Power          | mathsat5     | qspinlock, unmodified     | Liveness, Safety | 5 min         | :heavy_check_mark: |
 | Power          | yices2       | qspinlock, unmodified     | Liveness, Safety | 2 min         | :heavy_check_mark: |
-| LKMM           | Z3           | CNA, with fixes 1-5       | Liveness, Safety | 1h 54 min     | :heavy_check_mark: |
-| LKMM           | mathsat5     | CNA, with fixes 1-5       | Liveness, Safety | 19 min        | :heavy_check_mark: |
-| LKMM           | yices2       | CNA, with fixes 1-5       | Liveness, Safety | 7 min         | :heavy_check_mark: |
-| ARMv8          | Z3           | CNA, unmodified           | Liveness, Safety | 1h 36 min     | :heavy_check_mark: |
-| ARMv8          | mathsat5     | CNA, unmodified           | Liveness, Safety | 12 min        | :heavy_check_mark: |
-| ARMv8          | yices2       | CNA, unmodified           | Liveness, Safety | 4 min         | :heavy_check_mark: |
-| RISC-V         | Z3           | CNA, unmodified           | Liveness, Safety | 1h 36 min     | :heavy_check_mark: |
-| RISC-V         | mathsat5     | CNA, unmodified           | Liveness, Safety | 13 min        | :heavy_check_mark: |
-| RISC-V         | yices2       | CNA, unmodified           | Liveness, Safety | 4 min         | :heavy_check_mark: |
-| Power          | Z3           | CNA, unmodified           | Liveness, Safety | 2h 15 min     | :heavy_check_mark: |
-| Power          | mathsat5     | CNA, unmodified           | Liveness, Safety | 17 min        | :heavy_check_mark: |
-| Power          | yices2       | CNA, unmodified           | Liveness, Safety | 4 min         | :heavy_check_mark: |
+| Power          | z3           | qspinlock, unmodified     | Liveness, Safety | 20 min        | :heavy_check_mark: |
+| LKMM           | mathsat5     | CNA, with fixes 1-5       | Liveness, Safety | 5h 16 min     | :heavy_check_mark: |
+| LKMM           | yices2       | CNA, with fixes 1-5       | Liveness, Safety | 1h 31 min     | :heavy_check_mark: |
+| LKMM           | z3           | CNA, with fixes 1-5       | Liveness, Safety | 9h 31 min     | :heavy_check_mark: |
+| ARMv8          | mathsat5     | CNA, unmodified           | Liveness, Safety | 40 min        | :heavy_check_mark: |
+| ARMv8          | yices2       | CNA, unmodified           | Liveness, Safety | 10 min        | :heavy_check_mark: |
+| ARMv8          | z3           | CNA, unmodified           | Liveness, Safety | 9h 52 min     | :heavy_check_mark: |
+| RISC-V         | mathsat5     | CNA, unmodified           | Liveness, Safety | 42 min        | :heavy_check_mark: |
+| RISC-V         | yices2       | CNA, unmodified           | Liveness, Safety | 11 min        | :heavy_check_mark: |
+| RISC-V         | z3           | CNA, unmodified           | Liveness, Safety | 8h 13 min     | :heavy_check_mark: |
+| Power          | mathsat5     | CNA, unmodified           | Liveness, Safety | 1h 4 min      | :heavy_check_mark: |
+| Power          | yices2       | CNA, unmodified           | Liveness, Safety | 12 min        | :heavy_check_mark: |
+| Power          | z3           | CNA, unmodified           | Liveness, Safety | 8h 58 min     | :heavy_check_mark: |
+
 ## Verification of an alternative version of qpsinlock
 
 We also allow to verify an old version of qspinlock which contains an actual bug (i.e. reproducible in hardware) introduced by [this commit](https://github.com/torvalds/linux/commit/64d816cba06c67eeee455b8c78ebcda349d49c24).
