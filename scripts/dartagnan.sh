@@ -8,7 +8,7 @@ fi
 
 function usage()
 {
-        echo "Usage: $0 -m <armv8|power|lkmm> [-DVAR=VALUE] <FILE>"
+        echo "Usage: $0 -m <armv8|power|riscv|lkmm-v00|lkmm-v01> [-DVAR=VALUE] <FILE>"
         exit 1
 }
 
@@ -37,9 +37,13 @@ while [[ $# -gt 0 ]]; do
                                         target=riscv
                                         catfile=riscv.cat
                                         ;;
-                                lkmm)
+                                lkmm-v00)
                                         target=lkmm
-                                        catfile=linux-kernel.cat      
+                                        catfile=lkmm/lkmm-v00.cat      
+                                        ;;
+                                lkmm-v01)
+                                        target=lkmm
+                                        catfile=lkmm/lkmm-v01.cat      
                                         ;;
                                 *)
                                         usage
@@ -95,13 +99,13 @@ export DAT3M_OUTPUT=$(pwd)/output
 [ -z "$smtsolver" ] && smtsolver=Z3
 
 exec java -jar \
-        $DAT3M_HOME/dartagnan/target/dartagnan-3.1.0.jar \
+        $DAT3M_HOME/dartagnan/target/dartagnan-3.1.1.jar \
         $DAT3M_HOME/cat/${catfile} \
         --target=${target} \
         --bound=1 \
         --program.processing.constantPropagation=false \
         --refinement.baseline=no_oota \
-        --encoding.symmetry.breakOnRelation=rf \
+        --encoding.symmetry.breakOn=rf \
         --encoding.wmm.idl2sat=true \
         --modeling.threadCreateAlwaysSucceeds=true \
         --property=${properties} \
