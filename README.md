@@ -55,7 +55,7 @@ reported in [our technical note](https://arxiv.org/abs/2111.15240):
     ./scripts/docker-run-usecases.sh
 
 This last command will run GenMC and Dartagnan to verify the different locks
-(qspinlock, CNA) under the different memory models (IMM, LKMM, ARMv8, Power).
+(qspinlock, CNA) under the different memory models (IMM, LKMM, ARMv8, Power, RISCV).
 The content script is self-explanatory, and can be modified
 according to other possible use cases.
 
@@ -68,7 +68,7 @@ to output result files).
 Notice that after applying the CNA patch files to the original Linux source
 files, we apply our own patch `verification.patch`.
 This patch file contains the changes detailed in  **CNA and qspinlock changes** 
-of our [technical note](https://arxiv.org/abs/2111.15240) regarding .
+of our [technical note](https://arxiv.org/abs/2111.15240).
 
 ## The LKMM fixes patch
 
