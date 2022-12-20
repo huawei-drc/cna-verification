@@ -19,6 +19,7 @@ help:
 ###############################################################################
 .PHONY: docker_build
 docker_build:
+	mkdir -p certificates
 	scripts/build.sh -f dockerfiles/dartagnan.dockerfile -t cna-dartagnan .
 	scripts/build.sh -f dockerfiles/genmc.dockerfile -t cna-genmc .
 

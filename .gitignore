@@ -8,4 +8,23 @@ atomify.diff
 .patch.prepared
 *.ll
 *.diff
-output/
+output/On branch proxy
+Your branch is up to date with 'origin/proxy'.
+
+# downloaded files
+.fixes.applied
+dockerfiles/certificates/
+include/asm-generic/
+include/asm/
+include/linux/bug.h
+include/linux/cpumask.h
+include/linux/hardirq.h
+include/linux/moduleparam.h
+include/linux/mutex.h
+include/linux/percpu.h
+include/linux/prefetch.h
+include/linux/random.h
+include/linux/sched/
+include/linux/smp.h
+include/linux/topology.h
+kernel/
