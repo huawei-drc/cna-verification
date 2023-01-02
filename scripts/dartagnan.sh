@@ -88,8 +88,7 @@ if [ -z ${target} ]; then
 fi
 
 CFLAGS=""
-CFLAGS="${CFLAGS} -I$DAT3M_HOME/include/smack"
-CFLAGS="${CFLAGS} -I$DAT3M_HOME/include/clang"
+CFLAGS="${CFLAGS} -I$DAT3M_HOME/include"
 CFLAGS="${CFLAGS} -Iinclude"
 export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
