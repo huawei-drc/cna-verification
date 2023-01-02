@@ -23,6 +23,13 @@ system:
 - curl
 - Docker
 
+## Proxy
+
+If your organization requires the usage of ca certificates, create a
+"certificates" directory in the root of the git repository and fill it with
+the certificates files (`*.crt`) before building any docker image.
+The images will be built using these certificates.
+
 ## Verifying CNA using our Dockerfile
 
 We provide dockerfiles to ease the installation of GenMC and Dartagnan in a
