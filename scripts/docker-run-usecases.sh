@@ -144,7 +144,7 @@ do
         -t ${solver} \
         -p reachability,liveness \
         -DALGORITHM=${CNA_ALGORITHM} \
-        client-code.c | tee results/out13-dartagnan-${solver}-lkmm_v01-cna-both.txt
+        client-code.c | tee results/out13-dartagnan-${solver}-lkmm_v01-cna-both-none.txt
 
     # 14    Verifying CNA on Armv8 using Dartagnan,
     #       without applying any fix.
