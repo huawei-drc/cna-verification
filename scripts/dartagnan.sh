@@ -102,11 +102,11 @@ exec java -jar \
         $DAT3M_HOME/cat/${catfile} \
         --target=${target} \
         --bound=1 \
-        --program.processing.constantPropagation=false \
         --refinement.baseline=no_oota \
-        --encoding.symmetry.breakOn=rf \
+        --encoding.symmetry.breakOn=_cf \
         --encoding.wmm.idl2sat=true \
         --modeling.threadCreateAlwaysSucceeds=true \
+        --modeling.precision=64 \
         --property=${properties} \
         --method=${method} \
         --solver=${smtsolver} \
