@@ -54,12 +54,17 @@ RUN if [ "${https_proxy}" ]; then \
         export https_port=`echo ${https_proxy} | cut -d: -f 3`; \
     fi && \
     cd home/Dat3M && \
-    chmod 755 Dartagnan-SVCOMP.sh && \
     mvn -Dhttp.proxyHost="${https_host}" \
         -Dhttp.proxyPort="${https_port}" \
         -Dhttps.proxyHost="${https_host}" \
         -Dhttps.proxyPort="${https_port}" \
         clean install -DskipTests
+
+# Build atomic-replace library
+RUN cd home/Dat3M/llvm-passes/atomic-replace/ \
+    && mkdir build && cd build                \
+    && cmake ..                               \
+    && make all install
 
 # symlink for clang
 RUN ln -s clang-12 /usr/bin/clang

@@ -93,7 +93,7 @@ CFLAGS="${CFLAGS} -Iinclude"
 export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
 
-[ -z "$properties" ] && properties=reachability,liveness
+[ -z "$properties" ] && properties=program_spec,liveness
 [ -z "$method" ] && method=caat
 [ -z "$smtsolver" ] && smtsolver=Z3
 
