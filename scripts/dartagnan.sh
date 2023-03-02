@@ -110,5 +110,5 @@ exec java -jar \
         --property=${properties} \
         --method=${method} \
         --solver=${smtsolver} \
-        --witness.graphzviz=true \
+        --witness.graphviz=true \
         $@
