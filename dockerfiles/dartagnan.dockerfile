@@ -75,6 +75,7 @@ RUN apt-get update && apt-get install -y graphviz
 ENV DAT3M_HOME=/home/Dat3M
 ENV DAT3M_OUTPUT=/workspace/output
 ENV SMACK_FLAGS="-q -t --no-memory-splitting"
+ENV ATOMIC_REPLACE_OPTS="-mem2reg -sroa -early-cse -indvars -loop-unroll -simplifycfg -gvn"
 
 WORKDIR /workspace
 RUN adduser --disabled-password --gecos "" --home /workspace user1

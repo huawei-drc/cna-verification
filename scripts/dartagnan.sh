@@ -101,7 +101,8 @@ exec java -jar \
         $DAT3M_HOME/dartagnan/target/dartagnan-3.1.1.jar \
         $DAT3M_HOME/cat/${catfile} \
         --target=${target} \
-        --bound=1 \
+        --bound=10 \
+        --program.processing.propagateCopyAssignments=false \
         --refinement.baseline=no_oota \
         --encoding.symmetry.breakOn=_cf \
         --encoding.wmm.idl2sat=true \
