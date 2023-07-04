@@ -27,4 +27,7 @@ include/linux/random.h
 include/linux/sched/
 include/linux/smp.h
 include/linux/topology.h
-kernel/
+kernel/*
+!kernel/locking
+kernel/locking/*
+!kernel/locking/qspinlock.c
