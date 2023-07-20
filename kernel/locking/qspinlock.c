@@ -68,7 +68,7 @@
 #include "mcs_spinlock.h"
 /* NOTE: In the verification, we do not consider interrupts, so we can reduce
  * the number of nodes per core to 1. */
-#define MAX_NODES	1
+#define MAX_NODES	4
 
 /*
  * On 64-bit architectures, the mcs_spinlock structure will be 16 bytes in
@@ -132,7 +132,7 @@ static inline __pure struct mcs_spinlock *decode_tail(u32 tail)
 	int cpu = (tail >> _Q_TAIL_CPU_OFFSET) - 1;
 	int idx = (tail &  _Q_TAIL_IDX_MASK) >> _Q_TAIL_IDX_OFFSET;
 
-	return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+	return per_cpu_ptr(idx, cpu);
 }
 
 static inline __pure
@@ -452,7 +452,7 @@ queue:
 	lockevent_inc(lock_slowpath);
 pv_queue:
 	node = this_cpu_ptr(&qnodes[0].mcs);
-	idx = node->count++;
+	racy_inc(node->count, idx);
 	tail = encode_tail(smp_processor_id(), idx);
 
 	/*

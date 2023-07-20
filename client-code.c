@@ -35,6 +35,7 @@ void __VERIFIER_loop_bound(int);
 #include <pthread.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <dat3m.h>
 
 /* includes distributed in this repository */
 #include <linux/atomic.h> /* some linux atomic macros */
@@ -45,11 +46,31 @@ __thread int tid;
 #define smp_processor_id() tid
 
 /* functions and macros to retrieve mcs/cna node (context) */
+
+// returns a pointer to the start of the local version of nodes for cpu
 static void *get_node(int cpu);
-#define per_cpu_ptr(p, cpu) get_node(cpu)
+
+// Originally used like this
+//      per_cpu_ptr(&qnodes[idx].mcs, cpu);
+// Changed to be used like this
+//      per_cpu_ptr(idx, cpu);
+#define per_cpu_ptr(idx, cpu) &get_node(cpu)[(sizeof(struct qnode) * idx)]
+
+// Used like this 
+//      this_cpu_ptr(&qnodes[0].mcs);
 #define this_cpu_ptr(p) get_node(tid)
-#define __this_cpu_dec(x) ((struct mcs_spinlock*) this_cpu_ptr(x))->count--;
+
+// Used like this 
+//      __this_cpu_dec(qnodes[0].mcs.count);
+#define __this_cpu_dec(x) ({                                                        \
+    int i = __VERIFIER_racy_read(&((struct mcs_spinlock*) this_cpu_ptr(x))->count); \
+    __VERIFIER_racy_write(&((struct mcs_spinlock*) this_cpu_ptr(x))->count, i - 1); \
+})
 #define this_cpu_dec __this_cpu_dec
+
+#define racy_inc(x, i)                  \
+    i = __VERIFIER_racy_read(&x);       \
+    __VERIFIER_racy_write(&x, i + 1);   \
 
 /* NUMA node mapping and intra-node threshold for CNA */
 #if ALGORITHM == QSPINLOCK_CNA
@@ -83,20 +104,40 @@ static bool cna_threshold_reached = false;
 	#error "Invalid algorithm"
 #endif
 
-static void *get_node(int cpu) { return &nodes[cpu]; }
+static void *get_node(int cpu) { return &nodes[cpu * MAX_NODES]; }
 
 /*******************************************************************************
  * Client code
  ******************************************************************************/
 static int x = 0, y = 0;
+
+struct qspinlock lock_handler;
+
+void *handle(void *arg)
+{
+    tid = ((intptr_t) arg);
+
+	queued_spin_lock(&lock_handler);
+	queued_spin_unlock(&lock_handler);
+
+    return NULL;
+}
+
 static void* run(void *arg)
 {
 	tid = (intptr_t)arg;
+
+    pthread_t handler;
+
+    __VERIFIER_make_interrupt_handler();
+    pthread_create(&handler, NULL, handle, tid);
 
 	queued_spin_lock(&lock);
 	x = x + 1;
 	y = y + 1;
 	queued_spin_unlock(&lock);
+
+    pthread_join(handler, 0);
 
 	return NULL;
 }
