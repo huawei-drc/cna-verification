@@ -28,26 +28,22 @@ RUN update-ca-certificates
 
 # Install essential stuff ######################################################
 RUN apt-get update && apt-get install -y \
-    git build-essential cmake maven \
-    lsb-release sudo wget \
-    software-properties-common
-
-# Install SMACK ################################################################
-RUN cd home && \
-    git clone -b develop https://github.com/smackers/smack.git && \
-    cd smack && \
-    git checkout 497740c
-
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
-RUN cd home && \
-    cd smack && \
-    sed -i 's/sudo /sudo -E /' bin/build.sh && \
-    env TEST_SMACK=0 INSTALL_Z3=0 INSTALL_CORRAL=0 bin/build.sh
+        git \
+        build-essential \
+        cmake \
+        maven \
+        lsb-release \
+        sudo \
+        wget \
+        software-properties-common \
+        graphviz \
+        openjdk-17-jdk \
+        openjdk-17-jre
 
 # Install Dat3M ################################################################
 RUN cd home && \
     git clone https://github.com/hernanponcedeleon/Dat3M.git && \
-    cd Dat3M && git checkout e59dbcb928030380ef62602879a34e2f62817cd5
+    cd Dat3M && git checkout d0b2777be3f923bfd6ef3ba398fa5499705a82a0
 
 RUN if [ "${https_proxy}" ]; then \
         export https_host=`echo ${https_proxy} | cut -d: -f 2 | cut -d/ -f3`; \
@@ -60,22 +56,14 @@ RUN if [ "${https_proxy}" ]; then \
         -Dhttps.proxyPort="${https_port}" \
         clean install -DskipTests
 
-# Build atomic-replace library
-RUN cd home/Dat3M/llvm-passes/atomic-replace/ \
-    && mkdir build && cd build                \
-    && cmake ..                               \
-    && make all install
-
 # symlink for clang
 RUN ln -s clang-12 /usr/bin/clang
-
-RUN apt-get update && apt-get install -y graphviz
 
 # Prepare environment ##########################################################
 ENV DAT3M_HOME=/home/Dat3M
 ENV DAT3M_OUTPUT=/workspace/output
-ENV SMACK_FLAGS="-q -t --no-memory-splitting"
-ENV ATOMIC_REPLACE_OPTS="-mem2reg -sroa -early-cse -indvars -loop-unroll -simplifycfg -gvn"
+ENV CFLAGS="-I$DAT3M_HOME/include"
+ENV OPTFLAGS="-mem2reg -sroa -early-cse -indvars -loop-unroll -fix-irreducible -loop-simplify -simplifycfg -gvn"
 
 WORKDIR /workspace
 RUN adduser --disabled-password --gecos "" --home /workspace user1
