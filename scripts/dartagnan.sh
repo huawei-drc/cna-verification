@@ -98,7 +98,7 @@ export DAT3M_OUTPUT=$(pwd)/output
 [ -z "$smtsolver" ] && smtsolver=Z3
 
 exec java -jar \
-        $DAT3M_HOME/dartagnan/target/dartagnan-3.1.1.jar \
+        $DAT3M_HOME/dartagnan/target/dartagnan.jar \
         $DAT3M_HOME/cat/${catfile} \
         --target=${target} \
         --bound=10 \
