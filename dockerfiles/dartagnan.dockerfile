@@ -30,12 +30,9 @@ RUN update-ca-certificates
 RUN apt-get update && apt-get install -y \
         git \
         build-essential \
-        cmake \
         maven \
-        lsb-release \
         sudo \
         wget \
-        software-properties-common \
         graphviz \
         openjdk-17-jdk \
         openjdk-17-jre
