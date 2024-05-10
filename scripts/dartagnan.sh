@@ -94,7 +94,7 @@ export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
 
 [ -z "$properties" ] && properties=program_spec,liveness
-[ -z "$method" ] && method=caat
+[ -z "$method" ] && method=lazy
 [ -z "$smtsolver" ] && smtsolver=Z3
 
 exec java -jar \
@@ -102,14 +102,11 @@ exec java -jar \
         $DAT3M_HOME/cat/${catfile} \
         --target=${target} \
         --bound=10 \
-        --program.processing.propagateCopyAssignments=false \
         --refinement.baseline=no_oota \
         --encoding.symmetry.breakOn=_cf \
         --encoding.wmm.idl2sat=true \
         --modeling.threadCreateAlwaysSucceeds=true \
-        --modeling.precision=64 \
         --property=${properties} \
         --method=${method} \
         --solver=${smtsolver} \
-        --witness.graphviz=true \
         $@
