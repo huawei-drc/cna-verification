@@ -20,37 +20,37 @@ export DOCKER=1
 
 for solver in ${solvers}
 do
-    # 02    Checking liveness of qspinlock under LKMM v00 using Dartagnan,
+    # 02    Checking termination of qspinlock under LKMM v00 using Dartagnan,
     #       without applying any fix.
     #       Expect to find a violation.
     ./scripts/dartagnan.sh \
         -m lkmm-v00 \
         -t ${solver} \
-        -p liveness \
+        -p termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
-        client-code.c | tee results/out02-dartagnan-${solver}-lkmm_v00-qspinlock-liveness-none.txt
+        client-code.c | tee results/out02-dartagnan-${solver}-lkmm_v00-qspinlock-termination-none.txt
 
-    # 03    Checking liveness of qspinlock under LKMM v00 using Dartagnan,
+    # 03    Checking termination of qspinlock under LKMM v00 using Dartagnan,
     #       applying fix 1.
     #       Expect to find a violation.
     ./scripts/dartagnan.sh \
         -m lkmm-v00 \
         -t ${solver} \
-        -p liveness \
+        -p termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 \
-        client-code.c | tee results/out03-dartagnan-${solver}-lkmm_v00-qspinlock-liveness-1.txt
+        client-code.c | tee results/out03-dartagnan-${solver}-lkmm_v00-qspinlock-termination-1.txt
 
-    # 04    Checking liveness of qspinlock under LKMM v00 using Dartagnan,
+    # 04    Checking termination of qspinlock under LKMM v00 using Dartagnan,
     #       applying fix 1 and 2.
     #       Expect no violation found and result UNKNOWN.
     ./scripts/dartagnan.sh \
         -m lkmm-v00 \
         -t ${solver} \
-        -p liveness \
+        -p termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         -DFIX1 -DFIX2 \
-        client-code.c | tee results/out04-dartagnan-${solver}-lkmm_v00-qspinlock-liveness-12.txt
+        client-code.c | tee results/out04-dartagnan-${solver}-lkmm_v00-qspinlock-termination-12.txt
 
     # 05    Checking safety of qspinlock under LKMM v00 using Dartagnan,
     #       applying fixes 1 and 2.
@@ -91,7 +91,7 @@ do
     ./scripts/dartagnan.sh \
         -m lkmm-v01 \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         client-code.c | tee results/out08-dartagnan-${solver}-lkmm_v01-qspinlock-both-none.txt
 
@@ -101,7 +101,7 @@ do
     ./scripts/dartagnan.sh \
         -m armv8 \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         client-code.c | tee results/out09-dartagnan-${solver}-armv8-qspinlock-both-none.txt
 
@@ -111,7 +111,7 @@ do
     ./scripts/dartagnan.sh \
         -m riscv \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         client-code.c | tee results/out10-dartagnan-${solver}-riscv-qspinlock-both-none.txt
 
@@ -121,7 +121,7 @@ do
     ./scripts/dartagnan.sh \
         -m power \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${QSPINLOCK_ALGORITHM} \
         client-code.c | tee results/out11-dartagnan-${solver}-power-qspinlock-both-none.txt
 
@@ -131,7 +131,7 @@ do
     ./scripts/dartagnan.sh \
         -m lkmm-v00 \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${CNA_ALGORITHM} \
         -DFIX1 -DFIX2 -DFIX3 -DFIX4 -DFIX5 \
         client-code.c | tee results/out12-dartagnan-${solver}-lkmm_v00-cna-both-12345.txt
@@ -142,7 +142,7 @@ do
     ./scripts/dartagnan.sh \
         -m lkmm-v01 \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${CNA_ALGORITHM} \
         client-code.c | tee results/out13-dartagnan-${solver}-lkmm_v01-cna-both-none.txt
 
@@ -152,7 +152,7 @@ do
     ./scripts/dartagnan.sh \
         -m armv8 \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${CNA_ALGORITHM} \
         client-code.c | tee results/out14-dartagnan-${solver}-armv8-cna-both-none.txt
 
@@ -162,7 +162,7 @@ do
     ./scripts/dartagnan.sh \
         -m riscv \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${CNA_ALGORITHM} \
         client-code.c | tee results/out15-dartagnan-${solver}-riscv-cna-both-none.txt
 
@@ -172,7 +172,7 @@ do
     ./scripts/dartagnan.sh \
         -m power \
         -t ${solver} \
-        -p program_spec,liveness \
+        -p program_spec,termination \
         -DALGORITHM=${CNA_ALGORITHM} \
         client-code.c | tee results/out16-dartagnan-${solver}-power-cna-both-none.txt
 

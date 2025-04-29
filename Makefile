@@ -49,7 +49,7 @@ LINUX_FILES = \
 	include/asm-generic/qspinlock_types.h
 
 $(LINUX_FILES): %:
-	curl --create-dirs -o $* $(LINUX_URL)/$*?h=$(LINUX_VERSION) > /dev/null
+	curl -L --create-dirs -o $* $(LINUX_URL)/$*?h=$(LINUX_VERSION) > /dev/null
 
 .PHONY: linux_files
 linux_files: $(LINUX_FILES)

@@ -94,7 +94,7 @@ export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
 
 [ -z "$properties" ] && properties=program_spec,liveness
-[ -z "$method" ] && method=caat
+[ -z "$method" ] && method=lazy
 [ -z "$smtsolver" ] && smtsolver=Z3
 
 exec java -jar \
