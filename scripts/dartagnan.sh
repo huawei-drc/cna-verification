@@ -106,8 +106,6 @@ exec java -jar \
         --refinement.baseline=no_oota \
         --encoding.symmetry.breakOn=_cf \
         --encoding.wmm.idl2sat=true \
-        --modeling.threadCreateAlwaysSucceeds=true \
-        --modeling.precision=64 \
         --property=${properties} \
         --method=${method} \
         --solver=${smtsolver} \
