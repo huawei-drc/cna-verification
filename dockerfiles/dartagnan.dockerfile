@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -30,6 +30,7 @@ RUN update-ca-certificates
 RUN apt-get update && apt-get install -y \
         git \
         build-essential \
+        clang \
         maven \
         sudo \
         wget \
@@ -40,7 +41,7 @@ RUN apt-get update && apt-get install -y \
 # Install Dat3M ################################################################
 RUN cd home && \
     git clone https://github.com/hernanponcedeleon/Dat3M.git && \
-    cd Dat3M && git checkout d0b2777be3f923bfd6ef3ba398fa5499705a82a0
+    cd Dat3M && git checkout 0653bcc8d7ad634adab06b83c0476a48a8bc279c
 
 RUN if [ "${https_proxy}" ]; then \
         export https_host=`echo ${https_proxy} | cut -d: -f 2 | cut -d/ -f3`; \
@@ -52,9 +53,6 @@ RUN if [ "${https_proxy}" ]; then \
         -Dhttps.proxyHost="${https_host}" \
         -Dhttps.proxyPort="${https_port}" \
         clean install -DskipTests
-
-# symlink for clang
-RUN ln -s clang-12 /usr/bin/clang
 
 # Prepare environment ##########################################################
 ENV DAT3M_HOME=/home/Dat3M

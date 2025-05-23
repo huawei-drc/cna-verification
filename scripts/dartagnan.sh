@@ -39,11 +39,11 @@ while [[ $# -gt 0 ]]; do
                                         ;;
                                 lkmm-v00)
                                         target=lkmm
-                                        catfile=lkmm/lkmm-v00.cat      
+                                        catfile=lkmm-v00.cat
                                         ;;
                                 lkmm-v01)
                                         target=lkmm
-                                        catfile=lkmm/lkmm-v01.cat      
+                                        catfile=lkmm-v01.cat
                                         ;;
                                 *)
                                         usage
@@ -97,10 +97,11 @@ export DAT3M_OUTPUT=$(pwd)/output
 [ -z "$method" ] && method=lazy
 [ -z "$smtsolver" ] && smtsolver=Z3
 
-exec java -jar \
+exec java -DlogLevel=debug -jar \
         $DAT3M_HOME/dartagnan/target/dartagnan.jar \
-        $DAT3M_HOME/cat/${catfile} \
+        cat/${catfile} \
         --target=${target} \
+        --timeout=43200 \
         --bound=10 \
         --program.processing.propagateCopyAssignments=false \
         --refinement.baseline=no_oota \
