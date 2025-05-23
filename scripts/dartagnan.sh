@@ -93,7 +93,7 @@ CFLAGS="${CFLAGS} -Iinclude"
 export CFLAGS="${CFLAGS} ${defines}"
 export DAT3M_OUTPUT=$(pwd)/output
 
-[ -z "$properties" ] && properties=program_spec,liveness
+[ -z "$properties" ] && properties=program_spec,termination
 [ -z "$method" ] && method=lazy
 [ -z "$smtsolver" ] && smtsolver=Z3
 
@@ -111,5 +111,5 @@ exec java -DlogLevel=debug -jar \
         --property=${properties} \
         --method=${method} \
         --solver=${smtsolver} \
-        --witness.graphviz=true \
+        --witness=png \
         $@

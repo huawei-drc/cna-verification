@@ -10,6 +10,7 @@
 #define u16 uint16_t
 #define u8 uint8_t
 #define ulong u64
+typedef long loff_t;
 
 /* per cpu data */
 #define DEFINE_PER_CPU_ALIGNED(T, V) T V[CONFIG_NR_CPUS]
@@ -43,5 +44,12 @@
 #ifndef __always_inline
 #define __always_inline inline
 #endif
+
+#define __percpu
+#define __user
+#define __lockfunc
+#define LCB_F_SPIN (1U << 0)
+#define trace_contention_begin(A, B)
+#define trace_contention_end(A, B)
 
 #endif

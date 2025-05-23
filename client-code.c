@@ -1,4 +1,5 @@
 // Copyright (c) 2021 Diogo Behrens, Antonio Paolillo
+// Copyright (c) 2025 Hernan Ponce de Leon
 // SPDX-License-Identifier: MIT
 
 /*******************************************************************************

@@ -1,4 +1,5 @@
 # Copyright (c) 2021 Diogo Behrens, Antonio Paolillo
+# Copyright (c) 2025 Hernan Ponce de Leon
 # SPDX-License-Identifier: MIT
 
 all: prepared
@@ -8,11 +9,9 @@ default: prepared
 help:
 	@echo "Goals:"
 	@echo " docker_build    build dartagnan and genmc docker images"
-	@echo " linux_files     download Linux qspinlock (Linux 5.14)"
-	@echo " cna_patch       apply CNA patch"
-	@echo " verif_patch     apply verification patch"
+	@echo " linux_files     download Linux qspinlock"
 	@echo " empty_headers   create supporting empty headers"
-	@echo " prepared        apply all patches and be ready for verification"
+	@echo " prepared        ready for verification"
 
 ###############################################################################
 # Step 0: build docker images
@@ -27,24 +26,16 @@ docker_build:
 ###############################################################################
 # Step 1: get qspinlock files from kernel
 ###############################################################################
-# alternative: commit-bug
-LINUX_VERSION_TYPE ?= commit-recent
 LINUX_URL     = https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/
-ifeq ($(LINUX_VERSION_TYPE), commit-recent)
-	LINUX_VERSION = v5.14
-else
-	ifeq ($(LINUX_VERSION_TYPE), commit-old)
-		LINUX_VERSION = 64d816cba06c67eeee455b8c78ebcda349d49c24
-	else
-		$(info "unknown linux version: $(LINUX_VERSION_TYPE)")
-	endif
-endif
+LINUX_VERSION = 7586ac7c340c3672f116052c1d150f134810965b
 LINUX_FILES = \
 	kernel/locking/lock_events_list.h \
 	kernel/locking/lock_events.h \
 	kernel/locking/qspinlock_stat.h \
 	kernel/locking/qspinlock.c \
+	kernel/locking/qspinlock.h \
 	kernel/locking/mcs_spinlock.h \
+	include/asm-generic/mcs_spinlock.h \
 	include/asm-generic/qspinlock.h \
 	include/asm-generic/qspinlock_types.h
 
@@ -55,53 +46,7 @@ $(LINUX_FILES): %:
 linux_files: $(LINUX_FILES)
 
 ###############################################################################
-# Step 2: apply CNA patch
-###############################################################################
-CNA_PATCH_DIR = cna-v15
-CNA_PATCH_URL = https://lkml.org/lkml/diff/2021/5/14
-CNA_FILE  = kernel/locking/qspinlock_cna.h
-
-$(CNA_FILE): $(LINUX_FILES)
-	if [ $(LINUX_VERSION_TYPE) = "commit-recent" ]; then \
-		for patch_id in 820 818 822 823 817 819; do \
-			curl --create-dirs -o $(CNA_PATCH_DIR)/$$patch_id.diff $(CNA_PATCH_URL)/$$patch_id/1 ; \
-			patch -p1 --force < $(CNA_PATCH_DIR)/$$patch_id.diff ; \
-		done \
-	fi
-
-.PHONY: cna_patch
-cna_patch: $(CNA_FILE)
-
-###############################################################################
-# Step 3: apply verification patch
-###############################################################################
-VERIF_PATCH = verification-$(LINUX_VERSION_TYPE).patch
-VERIF_FILE  = .patch.applied
-
-$(VERIF_FILE): $(VERIF_PATCH) $(CNA_FILE)
-	patch -p1 < $(VERIF_PATCH)
-	@touch $@
-
-.PHONY: verif_patch
-verif_patch: $(VERIF_FILE)
-
-###############################################################################
-# Step 4: apply lkmm fixes patch
-###############################################################################
-FIXES_PATCH = lkmm-fixes.patch
-FIXES_FILE  = .fixes.applied
-
-$(FIXES_FILE): $(FIXES_PATCH) $(VERIF_FILE)
-	if [ $(LINUX_VERSION_TYPE) = "commit-recent" ]; then \
-		patch -p1 < $(FIXES_PATCH) ; \
-	fi
-	@touch $@
-
-.PHONY: fixes_patch
-fixes_patch: $(FIXES_FILE)
-
-###############################################################################
-# Step 5: create a bunch of empty header files to make qspinlock happy
+# Step 2: create a bunch of empty header files to make qspinlock happy
 ###############################################################################
 EMPTY_HEADERS = \
 	include/linux/hardirq.h \
@@ -116,9 +61,12 @@ EMPTY_HEADERS = \
 	include/linux/mutex.h \
 	include/linux/topology.h \
 	include/linux/cpumask.h \
+	include/linux/percpu-defs.h \
 	include/asm/byteorder.h \
 	include/asm/qspinlock.h \
-	include/asm/mcs_spinlock.h
+	include/asm/mcs_spinlock.h \
+	include/asm-generic/percpu.h \
+	include/trace/events/lock.h
 
 $(EMPTY_HEADERS): %:
 	@mkdir -p $(@D) 2> /dev/null
@@ -128,42 +76,8 @@ $(EMPTY_HEADERS): %:
 empty_headers: $(EMPTY_HEADERS)
 
 .PHONY: prepared
-prepared: $(FIXES_FILE) $(EMPTY_HEADERS)
+prepared: $(LINUX_FILES) $(EMPTY_HEADERS)
 
-
-###############################################################################
-# Patch creation targets
-#
-# Workflow
-# 1- start with clean repository from master
-# 2- run: make patch_prepare
-# 3- do the changes to the qspinlock and CNA files
-# 4- run: make patch_create
-# 5- review new patch file; if not ready, goto 3
-# 6- run: make patch_update
-# 7- commit modified verification patch to master
-###############################################################################
-PATCH_PREP_FILE = .patch.prepared
-NEW_VERIF_PATCH = $(VERIF_PATCH).new
-PATCH_BASE ?= HEAD
-
-$(PATCH_PREP_FILE):
-	git checkout -b patch-branch
-	make linux_files cna_patch empty_headers
-	git add include kernel
-	git commit -m"applied cna patch"
-	touch $@
-patch_prepare: $(PATCH_PREP_FILE)
-
-patch_update: $(PATCH_PREP_FILE)
-	git diff $(PATH_BASE) > $(NEW_VERIF_PATCH)
-
-patch_abort: clean
-	git reset --hard
-	git checkout master
-	git branch -D patch-branch
-
-.PHONY: patch_prepare patch_update patch_abort
 ###############################################################################
 # Other goals
 ###############################################################################
