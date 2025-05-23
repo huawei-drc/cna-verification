@@ -101,9 +101,10 @@ exec java -DlogLevel=debug -jar \
         $DAT3M_HOME/dartagnan/target/dartagnan.jar \
         cat/${catfile} \
         --target=${target} \
-        --timeout=43200 \
+        --timeout=3600 \
         --bound=10 \
         --program.processing.propagateCopyAssignments=false \
+        --program.processing.mixedSize=true \
         --refinement.baseline=no_oota \
         --encoding.symmetry.breakOn=_cf \
         --encoding.wmm.idl2sat=true \

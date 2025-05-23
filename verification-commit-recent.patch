@@ -27,18 +27,6 @@ index d74b138..68ab46d 100644
  }
  #endif
  
-@@ -96,7 +105,11 @@ static __always_inline void queued_spin_unlock(struct qspinlock *lock)
- 	/*
- 	 * unlock() needs release semantics:
- 	 */
-+#ifdef VERIFICATION
-+	atomic_fetch_sub_release(_Q_LOCKED_VAL, &lock->val);
-+#else
- 	smp_store_release(&lock->locked, 0);
-+#endif
- }
- #endif
- 
 diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
 index 8c1a21b..70bd251 100644
 --- a/kernel/locking/qspinlock.c
@@ -63,17 +51,6 @@ index 8c1a21b..70bd251 100644
  /**
   * clear_pending - clear the pending bit.
   * @lock: Pointer to queued spinlock structure
-@@ -263,7 +265,11 @@ static __always_inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lo
-  */
- static __always_inline void set_locked(struct qspinlock *lock)
- {
-+#ifdef VERIFICATION
-+	atomic_or(_Q_LOCKED_VAL, &lock->val);
-+#else
- 	WRITE_ONCE(lock->locked, _Q_LOCKED_VAL);
-+#endif
- }
- 
  
 diff --git a/kernel/locking/qspinlock_cna.h b/kernel/locking/qspinlock_cna.h
 index 17d56c7..0414a3d 100644
@@ -108,30 +85,6 @@ index 17d56c7..0414a3d 100644
  }
  
  static void __init cna_init_nodes_per_cpu(unsigned int cpu)
-@@ -111,6 +117,7 @@ static void __init cna_init_nodes_per_cpu(unsigned int cpu)
- 	int numa_node = cpu_to_node(cpu);
- 	int i;
- 
-+	__VERIFIER_loop_bound(MAX_NODES+1);
- 	for (i = 0; i < MAX_NODES; i++) {
- 		struct cna_node *cn = (struct cna_node *)grab_mcs_node(base, i);
- 
-@@ -136,6 +143,7 @@ static int __init cna_init_nodes(void)
- 	/* we store an ecoded tail word in the node's @locked field */
- 	BUILD_BUG_ON(sizeof(u32) > sizeof(unsigned int));
- 
-+	__VERIFIER_loop_bound(NTHREADS+1);
- 	for_each_possible_cpu(cpu)
- 		cna_init_nodes_per_cpu(cpu);
- 
-@@ -327,6 +335,7 @@ static __always_inline u32 cna_wait_head_or_lock(struct qspinlock *lock,
- 		 * Try and put the time otherwise spent spin waiting on
- 		 * _Q_LOCKED_PENDING_MASK to use by sorting our lists.
- 		 */
-+		__VERIFIER_loop_bound(NTHREADS+1);
- 		while (LOCK_IS_BUSY(lock) && !cna_order_queue(node))
- 			cpu_relax();
- 	} else {
 @@ -376,6 +385,8 @@ static inline void cna_lock_handoff(struct mcs_spinlock *node,
  	arch_mcs_lock_handoff(&next->locked, val);
  }
